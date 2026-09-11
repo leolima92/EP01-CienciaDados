@@ -34,17 +34,7 @@
 --     para evitar snowflake (RS2): dimensão não referencia outra dimensão.
 -- ============================================================================
 
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1
-        FROM information_schema.schemata
-        WHERE schema_name = 'silver'
-    ) THEN
-        CREATE SCHEMA silver;
-    END IF;
-END
-$$;
+CREATE SCHEMA IF NOT EXISTS silver;
 
 -- Recriação limpa (idempotência) — ordem inversa das dependências
 DROP TABLE IF EXISTS silver.fato_confronto   CASCADE;
