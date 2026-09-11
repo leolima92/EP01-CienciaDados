@@ -14,7 +14,7 @@ MONGO_URI     = os.getenv("MONGO_URI", "mongodb://localhost:27017")
 DB_NAME       = "pokedex_bronze"
 CACHE_DIR     = "dados_brutos"
 REQUEST_DELAY = 0.1        
-MAX_SPECIES   = 151
+MAX_SPECIES   = 721
 TYPE_IDS      = list(range(1, 19)) + [19, 10001, 10002]  
  
 CSV_POKEMON = "https://raw.githubusercontent.com/cdiener/pokemon_app/master/pokemon.csv"
