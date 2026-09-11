@@ -1,0 +1,4 @@
+pymongo[srv]>=4.6
+requests>=2.31
+python-dotenv>=1.0
+ 
