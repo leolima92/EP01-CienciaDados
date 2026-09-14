@@ -58,16 +58,16 @@ CONCILIACAO_CSV = "conciliacao.csv"   # relatório exigido por R4
 # Utilitários de arquivo/SQL
 # ----------------------------------------------------------------------------
 def achar_silver_sql():
-    aqui = os.path.dirname(os.path.abspath(__file__))
-    raiz = os.path.abspath(os.path.join(aqui, ".."))
+    diretorio_script = os.path.dirname(os.path.abspath(__file__))
+    raiz = os.path.abspath(os.path.join(diretorio_script, ".."))
     env = os.getenv("SILVER_SQL_PATH")
     if env and os.path.exists(env):
         return env
     candidatos = [
         os.path.join(os.getcwd(), "sql", "silver.sql"),
         os.path.join(os.getcwd(), "silver.sql"),
-        os.path.join(aqui, "silver.sql"),
-        os.path.join(aqui, "sql", "silver.sql"),
+        os.path.join(diretorio_script, "silver.sql"),
+        os.path.join(diretorio_script, "sql", "silver.sql"),
         os.path.join(raiz, "sql", "silver.sql"),
         os.path.join(raiz, "silver.sql"),
     ]
