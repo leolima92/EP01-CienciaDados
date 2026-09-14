@@ -54,20 +54,20 @@ ROMANO_PARA_NUM = {
 CONCILIACAO_CSV = "conciliacao.csv"   # relatório exigido por R4
 
 
-# ----------------------------------------------------------------------------
+
 # Utilitários de arquivo/SQL
-# ----------------------------------------------------------------------------
+
 def achar_silver_sql():
-    diretorio_script = os.path.dirname(os.path.abspath(__file__))
-    raiz = os.path.abspath(os.path.join(diretorio_script, ".."))
+    aqui = os.path.dirname(os.path.abspath(__file__))
+    raiz = os.path.abspath(os.path.join(aqui, ".."))
     env = os.getenv("SILVER_SQL_PATH")
     if env and os.path.exists(env):
         return env
     candidatos = [
         os.path.join(os.getcwd(), "sql", "silver.sql"),
         os.path.join(os.getcwd(), "silver.sql"),
-        os.path.join(diretorio_script, "silver.sql"),
-        os.path.join(diretorio_script, "sql", "silver.sql"),
+        os.path.join(aqui, "silver.sql"),
+        os.path.join(aqui, "sql", "silver.sql"),
         os.path.join(raiz, "sql", "silver.sql"),
         os.path.join(raiz, "silver.sql"),
     ]
@@ -119,9 +119,9 @@ def executar_sql_arquivo(conn, caminho):
             cur.execute(comando)
 
 
-# ----------------------------------------------------------------------------
+
 # Conciliação de nomes
-# ----------------------------------------------------------------------------
+
 def canonizar(s):
     s = unicodedata.normalize("NFKD", s or "")
     s = "".join(c for c in s if not unicodedata.combining(c))
@@ -146,9 +146,9 @@ def to_int(v):
     return int(v) if re.fullmatch(r"-?\d+", v) else None
 
 
-# ----------------------------------------------------------------------------
+
 # Dimensões limpas
-# ----------------------------------------------------------------------------
+
 def carregar_dim_geracao(conn):
     with conn.cursor() as cur:
         cur.executemany(
@@ -191,9 +191,8 @@ def carregar_dim_tipo_e_efetividade(conn, bronze):
     print(f"efetividade_tipo: {len(linhas)} combinações (esperado 324)")
 
 
-# ----------------------------------------------------------------------------
+
 # Conciliação + dim_pokemon
-# ----------------------------------------------------------------------------
 def carregar_conciliacao_e_pokemon(conn, bronze):
     especies = list(bronze["especies"].find())
     pokemons = list(bronze["pokemon"].find())
@@ -282,6 +281,12 @@ def carregar_conciliacao_e_pokemon(conn, bronze):
             habitat = "desconhecido"
         cor = (esp.get("color") or {}).get("name")
 
+        # O Mongo aninhou "Sp. Atk"/"Sp. Def" sob a chave "Sp" (o ponto vira
+        # subdocumento). Os valores estão íntegros, só precisam ser lidos de lá.
+        sp = l.get("Sp") or {}
+        sp_atk = to_int(sp.get(" Atk"))
+        sp_def = to_int(sp.get(" Def"))
+
         dim_rows.append((
             num_pokedex, num_csv, nome_csv,
             tipo_primario, tipo_secundario, geracao, raridade,
@@ -290,7 +295,7 @@ def carregar_conciliacao_e_pokemon(conn, bronze):
             pk.get("height"), pk.get("weight"), pk.get("base_experience"),
             esp.get("capture_rate"), esp.get("base_happiness"),
             to_int(l.get("HP")), to_int(l.get("Attack")), to_int(l.get("Defense")),
-            to_int(l.get("Sp. Atk")), to_int(l.get("Sp. Def")), to_int(l.get("Speed")),
+            sp_atk, sp_def, to_int(l.get("Speed")),
         ))
         tipo_por_csv[num_csv] = sk_tipo_por_nome.get(tipo_primario, -1)
         geracao_por_csv[num_csv] = sk_geracao_por_num.get(geracao, -1)
@@ -334,9 +339,8 @@ def carregar_conciliacao_e_pokemon(conn, bronze):
     }
 
 
-# ----------------------------------------------------------------------------
+
 # fato_confronto (grão de participação, via COPY)
-# ----------------------------------------------------------------------------
 def carregar_fato(conn, bronze, mapas):
     sk_pok = lambda c: mapas["sk_pokemon"].get(c, -1)
     sk_tp  = lambda c: mapas["sk_tipo"].get(c, -1)
@@ -381,14 +385,14 @@ def main():
         print(f"Recriando o schema silver a partir de: {caminho_sql}")
         executar_sql_arquivo(conn, caminho_sql)
 
-        print("\n== Etapa 1: dimensões limpas ==")
+        print("\n Etapa 1: dimensões limpas ")
         carregar_dim_geracao(conn)
         carregar_dim_tipo_e_efetividade(conn, bronze)
 
-        print("\n== Etapa 2: conciliação e dim_pokemon ==")
+        print("\n Etapa 2: conciliação e dim_pokemon")
         mapas = carregar_conciliacao_e_pokemon(conn, bronze)
 
-        print("\n== Etapa 3: fato_confronto ==")
+        print("\n Etapa 3: fato_confronto")
         carregar_fato(conn, bronze, mapas)
 
         conn.commit()
