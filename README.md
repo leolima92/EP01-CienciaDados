@@ -1,7 +1,7 @@
 # EP01 — ETL e Arquitetura Medalhão
 
 **Disciplina:** Ciência de Dados
-**Autores:** Leonardo Rodrigues de Lima e Yasmin Ayumi Foltran Mano
+**Autores:** Leonardo Rodrigues de Lima, Yasmin Ayumi Foltran Mano e Eduardo Leal Aruth
 
 ---
 
@@ -125,11 +125,11 @@ Arquivos utilizados:
 ```text
 extrair.py          fontes → Bronze                     ✅ PRONTO
 carregar.py         Bronze → Silver                     ✅ PRONTO
-publicar.py         Silver → Gold                       ⏳ PENDENTE
+publicar.py         Silver → Gold                       ✅ PRONTO
 
 sql/silver.sql      DDL do modelo dimensional           ✅ PRONTO
-sql/gold.sql        Schema e agregações da Gold         ⏳ PENDENTE
-sql/consultas.sql   8 análises em SQL                   ⏳ PENDENTE
+sql/gold.sql        Schema e agregações da Gold         ✅ PRONTO
+sql/consultas.sql   8 análises em SQL                   ✅ PRONTO
 
 conciliacao.csv     Relatório de conciliação (R4)       ✅ PRONTO
 ```
@@ -309,16 +309,16 @@ da Bronze e popula o modelo dimensional no PostgreSQL.
 
 ## 3. Camada Gold
 
-A camada Gold armazenará os dados agregados utilizados diretamente pelas consultas analíticas.
+Execute:
 
-Arquivos responsáveis:
-
-```text
-publicar.py
-sql/gold.sql
+```bash
+python publicar.py
 ```
 
-**Status:** ⏳ Em desenvolvimento.
+O script executa `sql/gold.sql`, que materializa as tabelas agregadas
+(uma por análise) **dentro do PostgreSQL**, e registra a publicação.
+
+**Status:** ✅ Concluída.
 
 ---
 
@@ -825,9 +825,8 @@ RELATORIO.md
 | PostgreSQL / Silver | ✅ Concluída          |
 | Modelo dimensional  | ✅ Concluído          |
 | Conciliação (R4)    | ✅ Concluída          |
-| PostgreSQL / Gold   | ⏳ Em desenvolvimento |
-| Consultas SQL       | ⏳ Em desenvolvimento |
+| PostgreSQL / Gold   | ✅ Concluída          |
+| Consultas SQL       | ✅ Concluída          |
 | Relatório final     | ⏳ Em desenvolvimento |
 
 ---
-
