@@ -33,9 +33,9 @@ def achar_sql(nome):
         os.path.join(raiz, nome),
     ]
 
-    for c in candidatos:
-        if os.path.exists(c):
-            return c
+    for i in candidatos:
+        if os.path.exists(i):
+            return i
 
     for base, dirs, arquivos in os.walk(raiz):
         dirs[:] = [d for d in dirs if d not in (".venv", ".venv-antigo",
