@@ -831,9 +831,3 @@ RELATORIO.md
 
 ---
 
-## 👥 Autores
-
-**Leonardo Rodrigues de Lima**
-**Yasmin Ayumi Foltran Mano**
-
-EP01 — Ciência de Dados
