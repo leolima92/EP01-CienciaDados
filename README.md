@@ -795,6 +795,90 @@ Como cada execução parte de tabelas vazias, rodar o pipeline novamente produz 
 
 ---
 
+# 🥇 Camada Gold
+
+A camada Gold é a **camada de consumo**: contém dados já agregados no grão de cada
+pergunta analítica. As consultas finais apenas leem estas tabelas, sem agregar nem
+juntar nada.
+
+Arquivos responsáveis:
+
+```text
+publicar.py
+sql/gold.sql
+```
+
+---
+
+## Agregação dentro do banco
+
+A principal regra desta camada:
+
+> A agregação acontece **dentro do PostgreSQL** (`CREATE TABLE ... AS SELECT`),
+> nunca na memória do Python.
+
+O `publicar.py` apenas orquestra: executa o `sql/gold.sql`, conta as linhas
+resultantes e registra a execução. Ele não transporta dados do silver para o
+Python para agregá-los — isso seria ineficiente e não escalável (seção 5.1 do
+enunciado). O `gold.sql` faz todo o trabalho de agregação no próprio banco.
+
+---
+
+## Tabelas do Gold
+
+Cada tabela corresponde a uma análise, materializada no grão da pergunta:
+
+| Tabela                                    | Grão                          | Análise |
+| ----------------------------------------- | ----------------------------- | ------- |
+| `gold.ranking_pokemon`                    | um Pokémon                    | 3       |
+| `gold.taxa_vitorias_por_tipo`             | um tipo primário              | 4       |
+| `gold.taxa_vitorias_por_faixa_velocidade` | uma faixa de velocidade       | 5       |
+| `gold.taxa_vitorias_por_multiplicador`    | um multiplicador (0/0.5/1/2)  | 6       |
+| `gold.matriz_confronto`                   | tipo atacante × defensor      | 7       |
+| `gold.taxa_vitorias_por_raridade`         | uma categoria de raridade     | 8       |
+
+A tabela `gold.log_publicacao` registra o histórico de execuções (tabela e
+contagem de linhas).
+
+---
+
+## ♻️ Idempotência da Gold
+
+Cada tabela é recriada com `DROP TABLE IF EXISTS` seguido de `CREATE TABLE AS SELECT`.
+Assim, reexecutar o `publicar.py` reconstrói o gold do zero a partir do silver,
+sem duplicar linhas.
+
+---
+
+## 🧠 Análise proposta pelo grupo (8ª análise)
+
+**Pergunta:** Pokémon de categorias mais raras (lendários e míticos) realmente
+vencem mais que os comuns?
+
+**Capacidade exigida do modelo:** usa o atributo derivado `categoria_raridade`
+(decisão 6 da modelagem), que **nenhuma** das sete análises obrigatórias utiliza.
+Isso demonstra que o modelo dimensional responde a perguntas não previstas em sua
+construção.
+
+---
+
+## ✅ Contagens esperadas da Gold
+
+| Tabela                                    | Linhas esperadas |
+| ----------------------------------------- | ---------------: |
+| `ranking_pokemon`                         |             ~783 |
+| `taxa_vitorias_por_tipo`                  |               18 |
+| `taxa_vitorias_por_faixa_velocidade`      |                5 |
+| `taxa_vitorias_por_multiplicador`         |                4 |
+| `matriz_confronto`                        |              324 |
+| `taxa_vitorias_por_raridade`              |                4 |
+
+> `ranking_pokemon` tem ~783 (e não 799) porque alguns Pokémon conciliados não
+> aparecem em nenhum combate do `combats.csv` — existem no cadastro, mas não têm
+> batalhas.
+
+---
+
 # 📊 Análises
 
 Após a construção das camadas Silver e Gold, o projeto responderá às **oito perguntas analíticas definidas no trabalho exclusivamente por SQL**.
