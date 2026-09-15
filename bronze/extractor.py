@@ -15,7 +15,7 @@ DB_NAME       = "pokedex_bronze"
 CACHE_DIR     = "dados_brutos"
 REQUEST_DELAY = 0.1        
 MAX_SPECIES   = 721
-TYPE_IDS      = list(range(1, 19)) + [19, 10001, 10002]  
+TYPE_IDS      = list(range(1, 19)) + [19, 10001, 10002] 
  
 CSV_POKEMON = "https://raw.githubusercontent.com/cdiener/pokemon_app/master/pokemon.csv"
 CSV_COMBATS = "https://raw.githubusercontent.com/cdiener/pokemon_app/master/combats.csv"
@@ -82,9 +82,8 @@ def extrair_tipos(db):
  
  
 def extrair_especies_e_formas(db):
-    """Itera as 721 espécies. A forma padrão e as formas Mega/Primal vivem em
-    `varieties[]`; a iteração 1..721 NÃO alcança as Mega (id > 10000), por isso
-    partimos da espécie e seguimos as varieties."""
+    """Itera as 721 espécies e extrai TODAS as formas de cada uma (padrão, Mega,
+     A iteração 1..721 NÃO alcança as formas alternativas (id > 10000)."""
     ops_esp, ops_pk = [], []
     ids_pokemon = set()
     for sid in range(1, MAX_SPECIES + 1):
@@ -92,12 +91,10 @@ def extrair_especies_e_formas(db):
         especie = buscar_json(f"especies/{sid}.json", url_sp)
         ops_esp.append(op_upsert(f"especie/{sid}", especie, "pokeapi", "_url", url_sp))
  
+        # Todas as formas da espécie (padrão + alternativas). O escopo exige as
+        # formas alternativas para conciliar os ~79 registros excedentes do
+        # pokemon.csv (Mega, Primal, Deoxys/Rotom/Giratina/Therian/etc.).
         for v in especie.get("varieties", []):
-            nome = v["pokemon"]["name"]
-            # Forma padrão + Mega (e Primal, por garantia contra o CSV de batalhas).
-            # Demais formas alternativas ficam fora do escopo.
-            if not (v.get("is_default") or "-mega" in nome or "-primal" in nome):
-                continue
             pid = int(v["pokemon"]["url"].rstrip("/").split("/")[-1])
             if pid in ids_pokemon:
                 continue
@@ -113,7 +110,6 @@ def extrair_especies_e_formas(db):
     gravar(db["pokemon"], ops_pk)
     print(f"especies:    {len(ops_esp)} documentos")
     print(f"pokemon:     {len(ops_pk)} documentos")
- 
 
 # Extração — CSV de batalhas
 def extrair_pokemon_csv(db):
@@ -147,11 +143,11 @@ def main():
     extrair_tipos(db)
     extrair_especies_e_formas(db)
  
-    print("== CSV ==")
+    print("CSV")
     extrair_pokemon_csv(db)
     extrair_combates_csv(db)
  
-    print("\n== Contagem final ==")
+    print("\n Contagem final")
     for c in ("pokemon", "especies", "tipos", "pokemon_csv", "combates"):
         print(f"  {c}: {db[c].count_documents({})}")
  
