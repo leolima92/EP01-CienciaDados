@@ -1,7 +1,8 @@
+**Integrantes:** Leonardo Rodrigues de Lima, Yasmin Ayumi Foltran Mano e Eduardo Leal Aruth
+
 # EP01 — ETL e Arquitetura Medalhão
 
 **Disciplina:** Ciência de Dados
-**Autores:** Leonardo Rodrigues de Lima, Yasmin Ayumi Foltran Mano e Eduardo Leal Aruth
 
 ---
 
@@ -78,8 +79,7 @@ O escopo utilizado no projeto contempla:
 
 * Gerações **I a VI**;
 * **721 espécies**;
-* formas **Mega**;
-* formas **Primal**, quando aplicável.
+* **todas as formas alternativas** de cada espécie (Mega, Primal, e formas como Deoxys, Rotom, Giratina, Therian, Kyurem, etc.), listadas em `varieties[]`.
 
 ---
 
@@ -89,9 +89,9 @@ Dataset público disponibilizado sob licença **MIT**.
 
 Arquivos utilizados:
 
-| Arquivo       | Conteúdo             |       Quantidade |
-| ------------- | -------------------- | ---------------: |
-| `pokemon.csv` | Cadastro dos Pokémon |    800 registros |
+| Arquivo       | Conteúdo             | Quantidade       |
+| ------------- | -------------------- | ---------------- |
+| `pokemon.csv` | Cadastro dos Pokémon | 800 registros    |
 | `combats.csv` | Batalhas simuladas   | 50.000 registros |
 
 ---
@@ -129,7 +129,7 @@ publicar.py         Silver → Gold                       ✅ PRONTO
 
 sql/silver.sql      DDL do modelo dimensional           ✅ PRONTO
 sql/gold.sql        Schema e agregações da Gold         ✅ PRONTO
-sql/consultas.sql   8 análises em SQL                   ✅ PRONTO
+sql/consultas.sql   8 análises em SQL                   ⏳ PENDENTE
 
 conciliacao.csv     Relatório de conciliação (R4)       ✅ PRONTO
 ```
@@ -160,14 +160,40 @@ pip install -r requirements.txt
 
 ---
 
+## Bibliotecas utilizadas
+
+Conforme a restrição do enunciado (R11), o pipeline **não utiliza `pandas`, `numpy`, `polars` nem `pyarrow`**. Toda a leitura das fontes usa os módulos `csv` e `json` da biblioteca padrão do Python.
+
+As dependências externas são:
+
+| Biblioteca      | Uso                                                                           |
+| --------------- | ----------------------------------------------------------------------------- |
+| `requests`      | cliente HTTP para a PokéAPI                                                   |
+| `pymongo`       | driver do MongoDB (camada Bronze)                                             |
+| `psycopg`       | driver do PostgreSQL (camadas Silver e Gold)                                  |
+| `python-dotenv` | carrega as credenciais do `.env`, mantendo segredos fora do código versionado |
+
+O `python-dotenv` é a única biblioteca fora da lista prevista no R11; sua função é exclusivamente de configuração (leitura do `.env`), não de manipulação de dados, e é justificada aqui conforme exigido.
+
+---
+
 ## MongoDB
 
-Utilizado para armazenamento da camada **Bronze**.
+Utilizado para armazenamento da camada **Bronze**. O banco lógico utilizado pela camada é `pokedex_bronze`.
 
 Pode ser utilizado:
 
 * MongoDB local; ou
 * MongoDB Atlas.
+
+### Inicialização
+
+Antes da execução de `extrair.py`, uma instância do MongoDB deve estar acessível pela URI configurada em `MONGO_URI`.
+
+* **MongoDB local:** inicie o serviço do MongoDB instalado na máquina e utilize, por exemplo, `mongodb://localhost:27017`. Não é necessário executar `CREATE DATABASE`: o banco `pokedex_bronze` e suas coleções são criados na primeira escrita.
+* **MongoDB Atlas:** crie o cluster, libere o acesso da máquina utilizada, crie o usuário do banco e informe a URI de conexão no `.env`.
+
+A conexão deve estar disponível **antes** da execução da camada Bronze.
 
 ---
 
@@ -182,6 +208,15 @@ Pode ser utilizado:
 
 * PostgreSQL local; ou
 * PostgreSQL na nuvem (ex.: Neon).
+
+### Inicialização
+
+Antes de executar `carregar.py`, o PostgreSQL deve estar acessível pela URI configurada em `POSTGRES_URI`.
+
+* **PostgreSQL local:** inicie o serviço do PostgreSQL e crie o banco `pokedex`, caso ele ainda não exista. Isso pode ser feito com `createdb pokedex` ou, dentro do `psql`, com `CREATE DATABASE pokedex;`.
+* **PostgreSQL na nuvem:** crie a instância/banco no provedor escolhido e copie a string de conexão para `POSTGRES_URI`.
+
+Os schemas `silver` e `gold` **não precisam ser criados manualmente**: eles são criados/recriados pelos arquivos SQL executados pelo pipeline.
 
 ---
 
@@ -232,6 +267,18 @@ POSTGRES_URI=postgresql://USUARIO:SENHA@ENDPOINT.neon.tech/DB?sslmode=require
 
 # ▶️ Como executar
 
+A ordem obrigatória do pipeline é **Bronze → Silver → Gold**. Cada etapa lê somente da camada imediatamente anterior.
+
+## 0. Preparar o ambiente
+
+1. instale as dependências com `pip install -r requirements.txt`;
+2. crie o arquivo `.env` a partir de `.env.example`;
+3. confirme que o MongoDB está acessível por `MONGO_URI`;
+4. confirme que o PostgreSQL está acessível por `POSTGRES_URI`;
+5. somente então execute os três scripts, na ordem indicada abaixo.
+
+---
+
 ## 1. Camada Bronze
 
 Execute:
@@ -276,19 +323,26 @@ Isso demonstra a **idempotência da camada Bronze**.
 | ------------- | -------------------: |
 | `tipos`       |                   21 |
 | `especies`    |                  721 |
-| `pokemon`     |                 ~770 |
+| `pokemon`     |                 ~940 |
 | `pokemon_csv` |                  800 |
 | `combates`    |               50.000 |
 
-A coleção `pokemon` possui aproximadamente 770 documentos porque contém:
+A coleção `pokemon` possui aproximadamente 940 documentos porque contém as **721 espécies padrão + todas as formas alternativas** listadas em `varieties[]`.
 
-```text
-721 Pokémon padrão
-+
-formas Mega
-+
-formas Primal
-```
+Isso inclui as formas de batalha (Mega, Primal, Deoxys, Rotom, Giratina, etc.) e também formas cosméticas da PokéAPI (padrões do Vivillon, cortes do Furfrou, cores do Flabébé) que não aparecem no `combats.csv`.
+
+A Bronze preserva a fonte por completo; a conciliação, na Silver, seleciona apenas as formas presentes no CSV.
+
+### Por que a Bronze possui 21 tipos e a Silver utiliza 18?
+
+O endpoint `/type/` da PokéAPI retorna **21 registros**. Os tipos `stellar`, `unknown` e `shadow` não pertencem ao conjunto de 18 tipos utilizado nas batalhas do dataset.
+
+Por isso, a decisão do projeto é:
+
+* preservar os **21 registros** na Bronze, mantendo a fonte intacta;
+* utilizar apenas os **18 tipos aplicáveis ao dataset de batalhas** na Silver e nas análises.
+
+O filtro ocorre somente durante a transformação Bronze → Silver. Dessa forma, a Bronze continua fiel à origem e a camada analítica evita categorias sem ocorrência no conjunto de batalhas.
 
 ---
 
@@ -300,8 +354,7 @@ Execute:
 python carregar.py
 ```
 
-O script recria o schema `silver`, executa `sql/silver.sql`, concilia os dados
-da Bronze e popula o modelo dimensional no PostgreSQL.
+O script recria o schema `silver`, executa `sql/silver.sql`, concilia os dados da Bronze e popula o modelo dimensional no PostgreSQL.
 
 **Status:** ✅ Concluída.
 
@@ -315,8 +368,7 @@ Execute:
 python publicar.py
 ```
 
-O script executa `sql/gold.sql`, que materializa as tabelas agregadas
-(uma por análise) **dentro do PostgreSQL**, e registra a publicação.
+O script executa `sql/gold.sql`, que materializa as tabelas agregadas (uma por análise) **dentro do PostgreSQL**, e registra a publicação.
 
 **Status:** ✅ Concluída.
 
@@ -423,8 +475,8 @@ O arquivo `combats.csv` não possui uma chave natural única.
 As colunas:
 
 ```text
-First
-Second
+First_pokemon
+Second_pokemon
 Winner
 ```
 
@@ -468,41 +520,13 @@ Os principais campos de linhagem são:
 
 ---
 
-# 🧬 Formas Mega
+# 🧬 Formas alternativas
 
-Uma simples iteração pelos IDs:
+Uma simples iteração pelos IDs `1 → 721` não alcança as formas alternativas (Mega, Primal, Deoxys, Rotom, etc.), pois muitas usam IDs superiores a `10000` na PokéAPI.
 
-```text
-1 → 721
-```
+Por isso, o fluxo de extração parte de `/pokemon-species/{id}` e percorre o campo `varieties[]`, coletando **todas as formas** de cada espécie — a forma padrão e todas as alternativas.
 
-não é suficiente para encontrar todas as formas Mega.
-
-Algumas delas utilizam IDs superiores a `10000` na PokéAPI.
-
-Por isso, o fluxo de extração parte de:
-
-```text
-/pokemon-species/{id}
-```
-
-e utiliza o campo:
-
-```text
-varieties[]
-```
-
-para identificar as diferentes formas disponíveis para uma espécie.
-
-São coletadas:
-
-* a forma padrão;
-* formas contendo `-mega`;
-* formas contendo `-primal`.
-
-As demais formas alternativas ficam fora do escopo do projeto.
-
-Essa estratégia também aumenta a compatibilidade com os nomes encontrados no dataset de batalhas.
+Isso é exigido pelo escopo do trabalho: extrair apenas as formas Mega inviabilizaria a conciliação de dezenas de registros do `combats.csv` que correspondem a formas alternativas (Deoxys, Rotom, Giratina, Therian, etc.).
 
 ---
 
@@ -651,6 +675,7 @@ sql/silver.sql
 A regra de ouro desta camada:
 
 > A Silver lê **somente da Bronze** (MongoDB) — nunca da PokéAPI ou dos CSVs.
+>
 > Se algo necessário não estiver na Bronze, a extração está incompleta.
 
 ---
@@ -661,7 +686,9 @@ A regra de ouro desta camada:
 
 Cada combate gera **duas linhas** (uma por combatente), totalizando **100.000 linhas** na fato.
 
-Essa escolha (decisão 1) reduz o cálculo da taxa de vitórias à **média de uma única coluna booleana** (`venceu`), eliminando o risco de dupla contagem que existiria se procurássemos cada Pokémon em duas colunas distintas. O custo é dobrar o volume da tabela fato.
+Essa escolha (decisão 1) reduz o cálculo da taxa de vitórias à **média de uma única coluna booleana** (`venceu`), eliminando o risco de dupla contagem que existiria se procurássemos cada Pokémon em duas colunas distintas.
+
+O custo é dobrar o volume da tabela fato.
 
 ---
 
@@ -675,68 +702,135 @@ Essa escolha (decisão 1) reduz o cálculo da taxa de vitórias à **média de u
                 efetividade_tipo
 ```
 
-| Tabela                     | Conteúdo                                                         | Ordem de grandeza |
-| -------------------------- | --------------------------------------------------------------- | ----------------: |
-| `silver.fato_confronto`    | resultado dos combates no grão de participação                  |           100.000 |
-| `silver.dim_pokemon`       | identificação, classificação, raridade e status de cada Pokémon |   800 (+especial) |
-| `silver.dim_tipo`          | os tipos, com denominação legível                               |    18 (+especial) |
-| `silver.dim_geracao`       | as gerações, com nome e região                                  |                 6 |
-| `silver.efetividade_tipo`  | multiplicador de dano de cada tipo atacante × defensor          |               324 |
-| `silver.log_conciliacao`   | auditoria da conciliação CSV × API (não é fato nem dimensão)    |               800 |
+| Tabela                    | Conteúdo                                                        | Ordem de grandeza |
+| ------------------------- | --------------------------------------------------------------- | ----------------: |
+| `silver.fato_confronto`   | resultado dos combates no grão de participação                  |           100.000 |
+| `silver.dim_pokemon`      | identificação, classificação, raridade e status de cada Pokémon |   800 (+especial) |
+| `silver.dim_tipo`         | os tipos, com denominação legível                               |    18 (+especial) |
+| `silver.dim_geracao`      | as gerações, com nome e região                                  |                 6 |
+| `silver.efetividade_tipo` | multiplicador de dano de cada tipo atacante × defensor          |               324 |
+| `silver.log_conciliacao`  | auditoria da conciliação CSV × API (não é fato nem dimensão)    |               800 |
 
-As **chaves substitutas** (`sk_*`) são inteiros gerados pelo próprio PostgreSQL. As chaves naturais (número da Pokédex e `#` do CSV) ficam como **atributos**, nunca como PK/FK — são o registro auditável da conciliação (RS3).
+As **chaves substitutas** (`sk_*`) são inteiros gerados pelo próprio PostgreSQL.
 
-`dim_tipo` e `dim_pokemon` são **dimensões papel** (*role-playing*): a fato as referencia duas vezes (participante e oponente). O `id_combate` na fato é uma **dimensão degenerada**, que liga as duas participações de um mesmo combate.
+As chaves naturais (número da Pokédex e `#` do CSV) ficam como **atributos**, nunca como PK/FK — são o registro auditável da conciliação (RS3).
+
+`dim_tipo` e `dim_pokemon` são **dimensões papel** (*role-playing*): a fato as referencia duas vezes (participante e oponente).
+
+O `id_combate` na fato é uma **dimensão degenerada**, que liga as duas participações de um mesmo combate.
 
 ---
 
 ## 🧩 As 6 decisões de modelagem (seção 4.2)
 
 **1. Grão da fato — participação.**
-Uma linha por combatente por combate (100.000 linhas). A taxa de vitórias vira `AVG(venceu)`. Custo: dobra o volume.
+
+Uma linha por combatente por combate (100.000 linhas). A taxa de vitórias vira `AVG(venceu)`.
+
+**Custo:** dobra o volume da tabela fato.
+
+---
 
 **2. Diferença de velocidade — métrica na fato.**
-A coluna `diferenca_velocidade` é gravada na fato (velocidade do participante − do oponente). Deixa a análise 5 aditiva; recalcular exigiria um auto-join com o oponente a cada consulta. Custo: espaço de armazenamento.
+
+A coluna `diferenca_velocidade` é gravada na fato (velocidade do participante − do oponente).
+
+Isso deixa a análise 5 aditiva; recalcular a diferença exigiria um auto-join com o oponente a cada consulta.
+
+**Custo:** espaço adicional de armazenamento.
+
+---
 
 **3. Efetividade de tipos — tabela separada (`efetividade_tipo`).**
-A matriz 18×18 (324 linhas) é materializada, então as análises 6 e 7 viram um `JOIN` (RS7). Quando o defensor tem dois tipos, os multiplicadores se multiplicam — esse caso é tratado na consulta/gold.
+
+A matriz 18×18 (324 linhas) é materializada, então as análises 6 e 7 podem obter a efetividade por `JOIN` (RS7).
+
+**Critério adotado:** o multiplicador considera apenas o **tipo primário** do defensor, resultando nos valores 0, 0,5, 1 e 2 — e não o critério de dois tipos, que produziria 0, 0,25, 0,5, 1, 2 e 4.
+
+A escolha simplifica a análise e mantém a matriz de confronto como um 18×18 limpo.
+
+**Custo:** perde-se parte da fidelidade da mecânica real para Pokémon com tipo secundário, pois a interação entre os dois tipos do defensor não entra no multiplicador.
+
+---
 
 **4. Oponente — dimensão papel.**
-O oponente é a mesma `dim_pokemon` referenciada uma segunda vez pela fato (`sk_pokemon` e `sk_pokemon_oponente`).
+
+O oponente é representado pela mesma `dim_pokemon`, referenciada uma segunda vez pela fato (`sk_pokemon` e `sk_pokemon_oponente`).
+
+Essa opção evita duplicar uma dimensão inteira apenas para representar o segundo papel exercido pela mesma entidade.
+
+**Custo:** a tabela fato passa a possuir duas referências para `dim_pokemon`, exigindo aliases claros nas consultas para distinguir participante e oponente.
+
+---
 
 **5. Status — em `dim_pokemon`.**
-HP, ataque, defesa e velocidade descrevem o Pokémon, então ficam na dimensão (para a análise 2). A diferença de velocidade é **duplicada** como métrica na fato (para a análise 5). Custo da duplicação avaliado como aceitável.
+
+HP, ataque, defesa e velocidade descrevem o Pokémon, então ficam na dimensão, atendendo à análise 2.
+
+A diferença de velocidade é **duplicada** como métrica na fato, atendendo à análise 5 e evitando recalcular a comparação entre os dois lados a cada consulta.
+
+**Custo:** há pequena redundância de informação, considerada aceitável em troca de consultas analíticas mais simples.
+
+---
 
 **6. Raridade — derivada na carga.**
-`categoria_raridade` (Lendário / Mítico / Bebê / Comum) é derivada dos indicadores booleanos durante a carga, em vez de resolvida por expressão em cada consulta.
+
+`categoria_raridade` (Lendário / Mítico / Bebê / Comum) é derivada dos indicadores booleanos durante a carga, em vez de ser reconstruída por uma expressão condicional em cada consulta.
+
+Isso centraliza a regra de classificação na Silver e mantém as consultas consistentes.
+
+**Custo:** uma mudança na regra de classificação exige nova carga da camada Silver, em vez de apenas alterar uma consulta.
+
+---
 
 **Decisão adicional — tipos vindos do CSV.**
-Os tipos de cada Pokémon são lidos do `pokemon.csv`, não da PokéAPI. O CSV traz a linha de cada **forma específica** (ex.: Wash Rotom é Água, não o tipo do Rotom padrão) e foi o CSV que alimentou a simulação de batalhas, o que mantém as análises de efetividade coerentes com os combates reais.
+
+Os tipos de cada Pokémon são lidos do `pokemon.csv`, não da PokéAPI.
+
+O CSV traz a linha de cada **forma específica** (ex.: Wash Rotom é Água, não o tipo do Rotom padrão) e foi o CSV que alimentou a simulação de batalhas, o que mantém as análises de efetividade coerentes com os combates reais.
 
 ---
 
 ## 🧷 Membros especiais (RS4)
 
-Nenhuma chave estrangeira da fato é nula. A ausência é representada por uma linha dedicada (`sk = -1`) em cada dimensão:
+Nenhuma chave estrangeira da fato é nula.
 
-| Dimensão      | Membro especial   | Uso                                       |
-| ------------- | ----------------- | ----------------------------------------- |
-| `dim_pokemon` | `(desconhecido)`  | registro sem nome (#63) e não conciliados |
-| `dim_tipo`    | `(nenhum)`        | tipo desconhecido / secundário ausente    |
-| `dim_geracao` | `(desconhecida)`  | geração desconhecida                      |
+A ausência é representada por uma linha dedicada (`sk = -1`) em cada dimensão:
 
-As batalhas dos registros não conciliados **permanecem** no modelo, apontando para o membro especial (R5: entram 50.000 combates, permanecem 50.000).
+| Dimensão      | Membro especial  | Uso                                       |
+| ------------- | ---------------- | ----------------------------------------- |
+| `dim_pokemon` | `(desconhecido)` | registro sem nome (#63) e não conciliados |
+| `dim_tipo`    | `(nenhum)`       | tipo desconhecido / secundário ausente    |
+| `dim_geracao` | `(desconhecida)` | geração desconhecida                      |
+
+As batalhas dos registros não conciliados **permanecem** no modelo, apontando para o membro especial.
+
+Assim, entram 50.000 combates e permanecem 50.000 combates.
+
+### Ausência de nome × habitat não aplicável
+
+O projeto diferencia duas ausências que aparecem como `null` na origem, mas possuem significados diferentes:
+
+* o registro `#63` do `pokemon.csv` possui **nome ausente**: a informação deveria existir, mas não foi registrada. Por isso, ele é tratado por um membro especial de `dim_pokemon`;
+* o campo `habitat` nulo em parte das espécies da PokéAPI representa **conceito não aplicável**, e não falha de coleta ou de conciliação. Esse valor é preservado como ausência semântica do atributo e **não transforma o Pokémon em desconhecido**.
+
+Assim, uma ausência de atributo descritivo não é confundida com ausência da entidade ou falha na chave de dimensão.
 
 ---
 
 ## 🔗 Conciliação por nome (R4)
 
-O `#` do `pokemon.csv` **não é** o número da Pokédex — é um índice sequencial de 1 a 800 no qual as formas Mega ocupam linhas próprias, deslocando a numeração. Não há relação aritmética entre os dois: a conciliação só é possível **por nome**.
+O `#` do `pokemon.csv` **não é** o número da Pokédex — é um índice sequencial de 1 a 800 no qual as formas alternativas ocupam linhas próprias, deslocando a numeração.
+
+Não há relação aritmética entre os dois: a conciliação só é possível **por nome**.
 
 A estratégia normaliza os nomes em três níveis:
 
-**1. Canonização.**
-Ambos os lados são reduzidos a minúsculas, sem acentos e sem caracteres especiais. Isso resolve automaticamente:
+### 1. Canonização
+
+Ambos os lados são reduzidos a minúsculas, sem acentos e sem caracteres especiais.
+
+Isso resolve automaticamente:
 
 ```text
 Farfetch'd   → farfetchd
@@ -746,7 +840,8 @@ Flabébé      → flabebe
 Nidoran♀     → nidoranf
 ```
 
-**2. Reordenação de Mega e Primal.**
+### 2. Reordenação de Mega e Primal
+
 A PokéAPI inverte a ordem desses nomes, então eles são reordenados antes de canonizar:
 
 ```text
@@ -754,21 +849,34 @@ Mega Charizard X → charizard-mega-x
 Primal Groudon   → groudon-primal
 ```
 
-**3. Fallback por espécie.**
-As formas alternativas (`Heat Rotom`, `Deoxys Attack Forme`, `Giratina Origin Forme`...) não existem na Bronze como pokémon (só as formas padrão + Mega/Primal foram extraídas). Para elas, busca-se a **espécie** cujo nome aparece no nome do CSV. Os atributos de classificação vêm da espécie; os tipos e status vêm do próprio CSV.
+### 3. Fallback por espécie
+
+Nos nomes de formas alternativas o CSV acrescenta palavras que a PokéAPI não usa (`Deoxys Attack Forme` vs `deoxys-attack`, `Heat Rotom` vs `rotom-heat`), então a correspondência direta falha.
+
+Para esses casos, busca-se a **espécie** cujo nome aparece no nome do CSV.
+
+Os **atributos de espécie** — geração, habitat, cor e raridade — são **herdados da espécie** correspondente, já que não existem nas formas alternativas, que só constam em `/pokemon` e não em `/pokemon-species`.
+
+Os tipos e status vêm do próprio CSV, específicos de cada forma.
 
 ### Resultado da conciliação
 
 ```text
 799 registros conciliados
-  1 não conciliado  → registro #63 (sem nome)
+1 não conciliado → registro #63 (sem nome)
 ```
 
-O único não conciliado é o registro sem nome (Problema 2 do enunciado). Ele é um **dado ausente**: existe, tem tipo (Fighting), status e batalhas, mas o nome não foi registrado na fonte. É tratado com membro especial, não descartado.
+O único não conciliado é o registro sem nome (Problema 2 do enunciado).
+
+Ele é um **dado ausente**: existe, tem tipo (Fighting), status e batalhas, mas o nome não foi registrado na fonte.
+
+É tratado com membro especial, não descartado.
 
 > **Observação sobre o #63**
 >
-> O `#63` do CSV **não é o Abra** (Pokédex #63). Como o `#` do CSV está deslocado pelas formas Mega, e pelos status/tipo (Fighting, 65/105/60/60/70/95, geração 1) o registro corresponde ao **Primeape** (Pokédex #57). Ainda assim, o modelo o mantém como desconhecido de propósito: o objetivo é tratar o dado ausente, não adivinhá-lo.
+> O `#63` do CSV **não é o Abra** (Pokédex #63). Como o `#` do CSV está deslocado pelas formas Mega, e pelos status/tipo (Fighting, 65/105/60/60/70/95, geração 1) o registro corresponde ao **Primeape** (Pokédex #57).
+>
+> Ainda assim, o modelo o mantém como desconhecido de propósito: o objetivo é tratar o dado ausente, não adivinhá-lo.
 
 O relatório completo da conciliação é gerado em `conciliacao.csv` e também na tabela `silver.log_conciliacao`.
 
@@ -776,7 +884,9 @@ O relatório completo da conciliação é gerado em `conciliacao.csv` e também 
 
 ## ♻️ Idempotência da Silver
 
-O `sql/silver.sql` recria o schema do zero a cada execução (`DROP TABLE IF EXISTS ... CASCADE` seguido de `CREATE TABLE`). O `carregar.py` executa esse DDL e em seguida repovoa as tabelas.
+O `sql/silver.sql` recria o schema do zero a cada execução (`DROP TABLE IF EXISTS ... CASCADE` seguido de `CREATE TABLE`).
+
+O `carregar.py` executa esse DDL e em seguida repovoa as tabelas.
 
 Como cada execução parte de tabelas vazias, rodar o pipeline novamente produz **exatamente o mesmo estado**, sem duplicar linhas.
 
@@ -784,22 +894,22 @@ Como cada execução parte de tabelas vazias, rodar o pipeline novamente produz 
 
 ## ✅ Contagens esperadas da Silver
 
-| Tabela             | Linhas esperadas       |
-| ------------------ | ---------------------: |
-| `dim_geracao`      |       7 (6 + especial) |
-| `dim_tipo`         |     19 (18 + especial) |
-| `efetividade_tipo` |                    324 |
-| `dim_pokemon`      |   800 (799 + especial) |
-| `fato_confronto`   |                100.000 |
-| `log_conciliacao`  |                    800 |
+| Tabela             |     Linhas esperadas |
+| ------------------ | -------------------: |
+| `dim_geracao`      |     7 (6 + especial) |
+| `dim_tipo`         |   19 (18 + especial) |
+| `efetividade_tipo` |                  324 |
+| `dim_pokemon`      | 800 (799 + especial) |
+| `fato_confronto`   |              100.000 |
+| `log_conciliacao`  |                  800 |
 
 ---
 
 # 🥇 Camada Gold
 
-A camada Gold é a **camada de consumo**: contém dados já agregados no grão de cada
-pergunta analítica. As consultas finais apenas leem estas tabelas, sem agregar nem
-juntar nada.
+A camada Gold é a **camada de consumo**: contém dados já agregados no grão de cada pergunta analítica.
+
+As consultas finais apenas leem estas tabelas, sem agregar nem juntar nada.
 
 Arquivos responsáveis:
 
@@ -814,13 +924,13 @@ sql/gold.sql
 
 A principal regra desta camada:
 
-> A agregação acontece **dentro do PostgreSQL** (`CREATE TABLE ... AS SELECT`),
-> nunca na memória do Python.
+> A agregação acontece **dentro do PostgreSQL** (`CREATE TABLE ... AS SELECT`), nunca na memória do Python.
 
-O `publicar.py` apenas orquestra: executa o `sql/gold.sql`, conta as linhas
-resultantes e registra a execução. Ele não transporta dados do silver para o
-Python para agregá-los — isso seria ineficiente e não escalável (seção 5.1 do
-enunciado). O `gold.sql` faz todo o trabalho de agregação no próprio banco.
+O `publicar.py` apenas orquestra: executa o `sql/gold.sql`, conta as linhas resultantes e registra a execução.
+
+Ele não transporta dados do Silver para o Python para agregá-los — isso seria ineficiente e não escalável.
+
+O `gold.sql` faz todo o trabalho de agregação no próprio banco.
 
 ---
 
@@ -828,72 +938,90 @@ enunciado). O `gold.sql` faz todo o trabalho de agregação no próprio banco.
 
 Cada tabela corresponde a uma análise, materializada no grão da pergunta:
 
-| Tabela                                    | Grão                          | Análise |
-| ----------------------------------------- | ----------------------------- | ------- |
-| `gold.ranking_pokemon`                    | um Pokémon                    | 3       |
-| `gold.taxa_vitorias_por_tipo`             | um tipo primário              | 4       |
-| `gold.taxa_vitorias_por_faixa_velocidade` | uma faixa de velocidade       | 5       |
-| `gold.taxa_vitorias_por_multiplicador`    | um multiplicador (0/0.5/1/2)  | 6       |
-| `gold.matriz_confronto`                   | tipo atacante × defensor      | 7       |
-| `gold.taxa_vitorias_por_raridade`         | uma categoria de raridade     | 8       |
+| Tabela                                    | Grão                         | Análise |
+| ----------------------------------------- | ---------------------------- | ------: |
+| `gold.ranking_pokemon`                    | um Pokémon                   |       3 |
+| `gold.taxa_vitorias_por_tipo`             | um tipo primário             |       4 |
+| `gold.taxa_vitorias_por_faixa_velocidade` | uma faixa de velocidade      |       5 |
+| `gold.taxa_vitorias_por_multiplicador`    | um multiplicador (0/0.5/1/2) |       6 |
+| `gold.matriz_confronto`                   | tipo atacante × defensor     |       7 |
+| `gold.taxa_vitorias_por_raridade`         | uma categoria de raridade    |       8 |
 
-A tabela `gold.log_publicacao` registra o histórico de execuções (tabela e
-contagem de linhas).
+A tabela `gold.log_publicacao` registra o histórico de execuções, com tabela e contagem de linhas.
 
 ---
 
 ## ♻️ Idempotência da Gold
 
 Cada tabela é recriada com `DROP TABLE IF EXISTS` seguido de `CREATE TABLE AS SELECT`.
-Assim, reexecutar o `publicar.py` reconstrói o gold do zero a partir do silver,
-sem duplicar linhas.
+
+Assim, reexecutar o `publicar.py` reconstrói o Gold do zero a partir do Silver, sem duplicar linhas.
 
 ---
 
 ## 🧠 Análise proposta pelo grupo (8ª análise)
 
-**Pergunta:** Pokémon de categorias mais raras (lendários e míticos) realmente
-vencem mais que os comuns?
+**Pergunta:** Pokémon de categorias mais raras (lendários e míticos) realmente vencem mais que os comuns?
 
-**Capacidade exigida do modelo:** usa o atributo derivado `categoria_raridade`
-(decisão 6 da modelagem), que **nenhuma** das sete análises obrigatórias utiliza.
-Isso demonstra que o modelo dimensional responde a perguntas não previstas em sua
-construção.
+**Relevância:** a análise testa uma hipótese intuitiva sobre o domínio: a de que Pokémon classificados como raros também apresentam desempenho superior nas batalhas simuladas.
+
+Comparar as categorias permite verificar se a raridade está de fato associada à taxa de vitórias ou se o rótulo de raridade não se traduz diretamente em vantagem no conjunto analisado.
+
+**Capacidade exigida do modelo:** usa o atributo derivado `categoria_raridade` (decisão 6 da modelagem), que **nenhuma** das sete análises obrigatórias utiliza.
+
+Isso demonstra que o modelo dimensional responde a perguntas não previstas em sua construção.
 
 ---
 
 ## ✅ Contagens esperadas da Gold
 
-| Tabela                                    | Linhas esperadas |
-| ----------------------------------------- | ---------------: |
-| `ranking_pokemon`                         |             ~783 |
-| `taxa_vitorias_por_tipo`                  |               18 |
-| `taxa_vitorias_por_faixa_velocidade`      |                5 |
-| `taxa_vitorias_por_multiplicador`         |                4 |
-| `matriz_confronto`                        |              324 |
-| `taxa_vitorias_por_raridade`              |                4 |
+| Tabela                               | Linhas esperadas |
+| ------------------------------------ | ---------------: |
+| `ranking_pokemon`                    |             ~783 |
+| `taxa_vitorias_por_tipo`             |               18 |
+| `taxa_vitorias_por_faixa_velocidade` |                5 |
+| `taxa_vitorias_por_multiplicador`    |                4 |
+| `matriz_confronto`                   |              324 |
+| `taxa_vitorias_por_raridade`         |                4 |
 
-> `ranking_pokemon` tem ~783 (e não 799) porque alguns Pokémon conciliados não
-> aparecem em nenhum combate do `combats.csv` — existem no cadastro, mas não têm
-> batalhas.
+> `ranking_pokemon` tem aproximadamente 783 registros, e não 799, porque alguns Pokémon conciliados não aparecem em nenhum combate do `combats.csv` — existem no cadastro, mas não têm batalhas.
 
 ---
 
 # 📊 Análises
 
-Após a construção das camadas Silver e Gold, o projeto responderá às **oito perguntas analíticas definidas no trabalho exclusivamente por SQL**.
+As oito análises do trabalho serão respondidas exclusivamente por SQL.
 
-As consultas ficarão disponíveis em:
+As análises 1 e 2 consultarão a camada Silver; as análises 3 a 7 e a análise proposta pelo grupo lerão diretamente tabelas já agregadas da camada Gold.
+
+As consultas serão implementadas em:
 
 ```text
 sql/consultas.sql
 ```
 
-Os resultados e interpretações serão documentados em:
+## Decisões que serão fechadas junto com `consultas.sql`
 
-```text
-RELATORIO.md
-```
+Duas escolhas do enunciado dependem da consulta final e **ainda estão pendentes de definição pelo grupo**:
+
+* **Análise 3 — corte mínimo de combates:** será definido um número mínimo de confrontos para que um Pokémon entre no ranking. A coluna com a quantidade de combates permanece materializada em `gold.ranking_pokemon`; o corte será aplicado apenas na consulta final, permitindo alterá-lo sem reconstruir a Gold.
+* **Análise 5 — faixas de diferença de velocidade:** a Gold já trabalha no grão de faixa de velocidade, mas os limites adotados devem ser registrados e justificados quando a consulta final for concluída.
+
+Esses valores **não são inventados neste README** antes da implementação das consultas.
+
+O documento deve ser atualizado assim que o grupo fechar os critérios.
+
+---
+
+## Orientação da matriz da análise 7
+
+A matriz de confronto é orientada pelo **resultado da batalha**, e não por `First_pokemon`.
+
+A célula `(A, B)` representa a proporção de confrontos entre os tipos primários A e B vencida pelo Pokémon do tipo A.
+
+O mesmo confronto contribui de forma complementar para `(A, B)` e `(B, A)`.
+
+Os resultados e suas interpretações serão registrados posteriormente em `RELATORIO.md`, após a conclusão de `sql/consultas.sql`.
 
 ---
 
@@ -910,7 +1038,8 @@ RELATORIO.md
 | Modelo dimensional  | ✅ Concluído          |
 | Conciliação (R4)    | ✅ Concluída          |
 | PostgreSQL / Gold   | ✅ Concluída          |
-| Consultas SQL       | ✅ Concluída          |
-| Relatório final     | ⏳ Em desenvolvimento |
+| Consultas SQL       | ⏳ Em desenvolvimento |
+| Relatório final     | ⏳ Após as consultas  |
 
 ---
+
