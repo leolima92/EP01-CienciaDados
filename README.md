@@ -134,12 +134,6 @@ sql/consultas.sql   8 análises em SQL                   ⏳ PENDENTE
 conciliacao.csv     Relatório de conciliação (R4)       ✅ PRONTO
 ```
 
-> **Observação**
->
-> No estado atual do projeto, o extrator está localizado em `bronze/extractor.py`.
->
-> Caso esse layout seja mantido, os comandos apresentados neste README deverão ser ajustados. O enunciado sugere `extrair.py` na raiz do projeto, portanto é recomendável alinhar a estrutura antes da entrega final.
-
 ---
 
 # ⚙️ Pré-requisitos
@@ -256,13 +250,6 @@ POSTGRES_URI=postgresql://USUARIO:SENHA@localhost:5432/pokedex
 # Neon (nuvem)
 POSTGRES_URI=postgresql://USUARIO:SENHA@ENDPOINT.neon.tech/DB?sslmode=require
 ```
-
-> ⚠️ **Importante**
->
-> O arquivo `.env` está incluído no `.gitignore` e **nunca deve ser versionado**.
->
-> Ele pode conter usuários, senhas e outras informações sensíveis de acesso aos bancos de dados.
-
 ---
 
 # ▶️ Como executar
