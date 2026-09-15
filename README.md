@@ -258,6 +258,44 @@ POSTGRES_URI=postgresql://USUARIO:SENHA@localhost:5432/pokedex
 POSTGRES_URI=postgresql://USUARIO:SENHA@ENDPOINT.neon.tech/DB?sslmode=require
 ```
 
+> ⚠️ **Importante**
+>
+> O arquivo `.env` está incluído no `.gitignore` e **nunca deve ser versionado**.
+>
+> Ele pode conter usuários, senhas e outras informações sensíveis de acesso aos bancos de dados.
+
+---
+
+# 🐳 Subindo os bancos com Docker (opcional)
+
+Caso o MongoDB e o PostgreSQL não estejam instalados na máquina, é possível subir
+ambos rapidamente com Docker:
+
+```bash
+# MongoDB (porta 27017)
+docker run -d --name pokedex-mongo -p 27017:27017 mongo:7
+
+# PostgreSQL (porta 5432, já cria o banco "pokedex")
+docker run -d --name pokedex-postgres -p 5432:5432 \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=pokedex \
+  postgres:16
+```
+
+Com os contêineres no ar, o `.env` correspondente é exatamente o do modelo
+`.env.example`:
+
+```env
+MONGO_URI=mongodb://localhost:27017
+POSTGRES_URI=postgresql://postgres:postgres@localhost:5432/pokedex
+```
+
+As fontes de dados (PokéAPI e os CSVs de batalha) são públicas e não exigem
+autenticação, portanto o pipeline reconstrói todas as camadas do zero em qualquer
+instância vazia de MongoDB e PostgreSQL.
+
+---
+
 # ▶️ Como executar
 
 A ordem obrigatória do pipeline é **Bronze → Silver → Gold**. Cada etapa lê somente da camada imediatamente anterior.
@@ -1043,4 +1081,4 @@ Os resultados e suas interpretações são registrados em `RELATORIO.md`.
 
 ---
 
-EP01 — Ciência de Dados
+EP01 — Ciência de Dadosw
