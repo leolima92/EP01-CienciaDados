@@ -1,0 +1,10 @@
+# Modelo de configuração. Copie para .env e preencha:  cp .env.example .env
+# MongoDB — camada Bronze
+#  - Local / Docker:  mongodb://localhost:27017
+#  - Atlas (nuvem):   mongodb+srv://USUARIO:SENHA@SEU_CLUSTER.mongodb.net/?retryWrites=true&w=majority
+MONGO_URI=mongodb://localhost:27017
+
+# PostgreSQL — camadas Silver e Gold
+#  - Local / Docker:  postgresql://postgres:postgres@localhost:5432/pokedex
+#  - Neon (nuvem):    postgresql://USUARIO:SENHA@ENDPOINT.neon.tech/DB?sslmode=require
+POSTGRES_URI=postgresql://postgres:postgres@localhost:5432/pokedex
