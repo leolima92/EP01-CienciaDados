@@ -20,11 +20,11 @@ Ao final do pipeline, o projeto disponibiliza dados tratados e agregados para re
 
 ## 🏗️ Arquitetura
 
-| Camada        | Tecnologia | Conteúdo                                               | Scripts                          |
-| ------------- | ---------- | ------------------------------------------------------ | -------------------------------- |
-| 🥉 **Bronze** | MongoDB    | Dados brutos, preservados conforme a fonte             | `extrair.py`                     |
-| 🥈 **Silver** | PostgreSQL | Dados tratados em modelo dimensional / esquema estrela | `carregar.py` + `sql/silver.sql` |
-| 🥇 **Gold**   | PostgreSQL | Dados agregados no grão das perguntas analíticas       | `publicar.py` + `sql/gold.sql`   |
+| Camada        | Tecnologia | Conteúdo                                               | Scripts                                 |
+| ------------- | ---------- | ------------------------------------------------------ | --------------------------------------- |
+| 🥉 **Bronze** | MongoDB    | Dados brutos, preservados conforme a fonte             | `bronze/extractor.py`                   |
+| 🥈 **Silver** | PostgreSQL | Dados tratados em modelo dimensional / esquema estrela | `silver/carregar.py` + `sql/silver.sql` |
+| 🥇 **Gold**   | PostgreSQL | Dados agregados no grão das perguntas analíticas       | `gold/publicar.py` + `sql/gold.sql`     |
 
 O fluxo do projeto segue a seguinte estrutura:
 
@@ -106,9 +106,12 @@ Arquivos utilizados:
 ├── .env.example
 ├── .gitignore
 │
-├── extrair.py
-├── carregar.py
-├── publicar.py
+├── bronze/
+│   └── extractor.py
+├── silver/
+│   └── carregar.py
+├── gold/
+│   └── publicar.py
 │
 ├── sql/
 │   ├── silver.sql
@@ -123,16 +126,20 @@ Arquivos utilizados:
 ### Status dos arquivos
 
 ```text
-extrair.py          fontes → Bronze                     ✅ PRONTO
-carregar.py         Bronze → Silver                     ✅ PRONTO
-publicar.py         Silver → Gold                       ✅ PRONTO
+bronze/extractor.py   fontes → Bronze                    ✅ PRONTO
+silver/carregar.py    Bronze → Silver                    ✅ PRONTO
+gold/publicar.py      Silver → Gold                      ✅ PRONTO
 
-sql/silver.sql      DDL do modelo dimensional           ✅ PRONTO
-sql/gold.sql        Schema e agregações da Gold         ✅ PRONTO
-sql/consultas.sql   8 análises em SQL                   ⏳ PENDENTE
+sql/silver.sql        DDL do modelo dimensional          ✅ PRONTO
+sql/gold.sql          Schema e agregações da Gold        ✅ PRONTO
+sql/consultas.sql     8 análises em SQL                  ✅ PRONTO
 
-conciliacao.csv     Relatório de conciliação (R4)       ✅ PRONTO
+conciliacao.csv       Relatório de conciliação (R4)      ✅ PRONTO
 ```
+
+> **Observação sobre a organização**
+>
+> Os scripts estão organizados em pastas por camada (`bronze/`, `silver/`, `gold/`). Os comandos apresentados neste README já refletem esses caminhos. Os arquivos SQL ficam centralizados em `sql/`, e os scripts localizam automaticamente o `.sql` correspondente independentemente da pasta a partir da qual são executados.
 
 ---
 
@@ -182,7 +189,7 @@ Pode ser utilizado:
 
 ### Inicialização
 
-Antes da execução de `extrair.py`, uma instância do MongoDB deve estar acessível pela URI configurada em `MONGO_URI`.
+Antes da execução de `bronze/extractor.py`, uma instância do MongoDB deve estar acessível pela URI configurada em `MONGO_URI`.
 
 * **MongoDB local:** inicie o serviço do MongoDB instalado na máquina e utilize, por exemplo, `mongodb://localhost:27017`. Não é necessário executar `CREATE DATABASE`: o banco `pokedex_bronze` e suas coleções são criados na primeira escrita.
 * **MongoDB Atlas:** crie o cluster, libere o acesso da máquina utilizada, crie o usuário do banco e informe a URI de conexão no `.env`.
@@ -205,7 +212,7 @@ Pode ser utilizado:
 
 ### Inicialização
 
-Antes de executar `carregar.py`, o PostgreSQL deve estar acessível pela URI configurada em `POSTGRES_URI`.
+Antes de executar `silver/carregar.py`, o PostgreSQL deve estar acessível pela URI configurada em `POSTGRES_URI`.
 
 * **PostgreSQL local:** inicie o serviço do PostgreSQL e crie o banco `pokedex`, caso ele ainda não exista. Isso pode ser feito com `createdb pokedex` ou, dentro do `psql`, com `CREATE DATABASE pokedex;`.
 * **PostgreSQL na nuvem:** crie a instância/banco no provedor escolhido e copie a string de conexão para `POSTGRES_URI`.
@@ -250,7 +257,6 @@ POSTGRES_URI=postgresql://USUARIO:SENHA@localhost:5432/pokedex
 # Neon (nuvem)
 POSTGRES_URI=postgresql://USUARIO:SENHA@ENDPOINT.neon.tech/DB?sslmode=require
 ```
----
 
 # ▶️ Como executar
 
@@ -271,7 +277,7 @@ A ordem obrigatória do pipeline é **Bronze → Silver → Gold**. Cada etapa l
 Execute:
 
 ```bash
-python extrair.py
+python bronze/extractor.py
 ```
 
 ### Primeira execução
@@ -287,7 +293,7 @@ Na primeira execução, o script:
 Na segunda execução:
 
 ```bash
-python extrair.py
+python bronze/extractor.py
 ```
 
 o pipeline reutiliza o cache local.
@@ -338,7 +344,7 @@ O filtro ocorre somente durante a transformação Bronze → Silver. Dessa forma
 Execute:
 
 ```bash
-python carregar.py
+python silver/carregar.py
 ```
 
 O script recria o schema `silver`, executa `sql/silver.sql`, concilia os dados da Bronze e popula o modelo dimensional no PostgreSQL.
@@ -352,7 +358,7 @@ O script recria o schema `silver`, executa `sql/silver.sql`, concilia os dados d
 Execute:
 
 ```bash
-python publicar.py
+python gold/publicar.py
 ```
 
 O script executa `sql/gold.sql`, que materializa as tabelas agregadas (uma por análise) **dentro do PostgreSQL**, e registra a publicação.
@@ -655,7 +661,7 @@ A camada Silver transforma os documentos brutos da Bronze em um **modelo dimensi
 Arquivos responsáveis:
 
 ```text
-carregar.py
+silver/carregar.py
 sql/silver.sql
 ```
 
@@ -873,7 +879,7 @@ O relatório completo da conciliação é gerado em `conciliacao.csv` e também 
 
 O `sql/silver.sql` recria o schema do zero a cada execução (`DROP TABLE IF EXISTS ... CASCADE` seguido de `CREATE TABLE`).
 
-O `carregar.py` executa esse DDL e em seguida repovoa as tabelas.
+O `silver/carregar.py` executa esse DDL e em seguida repovoa as tabelas.
 
 Como cada execução parte de tabelas vazias, rodar o pipeline novamente produz **exatamente o mesmo estado**, sem duplicar linhas.
 
@@ -901,7 +907,7 @@ As consultas finais apenas leem estas tabelas, sem agregar nem juntar nada.
 Arquivos responsáveis:
 
 ```text
-publicar.py
+gold/publicar.py
 sql/gold.sql
 ```
 
@@ -913,7 +919,7 @@ A principal regra desta camada:
 
 > A agregação acontece **dentro do PostgreSQL** (`CREATE TABLE ... AS SELECT`), nunca na memória do Python.
 
-O `publicar.py` apenas orquestra: executa o `sql/gold.sql`, conta as linhas resultantes e registra a execução.
+O `gold/publicar.py` apenas orquestra: executa o `sql/gold.sql`, conta as linhas resultantes e registra a execução.
 
 Ele não transporta dados do Silver para o Python para agregá-los — isso seria ineficiente e não escalável.
 
@@ -942,7 +948,7 @@ A tabela `gold.log_publicacao` registra o histórico de execuções, com tabela 
 
 Cada tabela é recriada com `DROP TABLE IF EXISTS` seguido de `CREATE TABLE AS SELECT`.
 
-Assim, reexecutar o `publicar.py` reconstrói o Gold do zero a partir do Silver, sem duplicar linhas.
+Assim, reexecutar o `gold/publicar.py` reconstrói o Gold do zero a partir do Silver, sem duplicar linhas.
 
 ---
 
@@ -977,26 +983,33 @@ Isso demonstra que o modelo dimensional responde a perguntas não previstas em s
 
 # 📊 Análises
 
-As oito análises do trabalho serão respondidas exclusivamente por SQL.
+As oito análises do trabalho são respondidas exclusivamente por SQL.
 
-As análises 1 e 2 consultarão a camada Silver; as análises 3 a 7 e a análise proposta pelo grupo lerão diretamente tabelas já agregadas da camada Gold.
+As análises 1 e 2 consultam a camada Silver; as análises 3 a 7 e a análise proposta pelo grupo leem diretamente tabelas já agregadas da camada Gold.
 
-As consultas serão implementadas em:
+As consultas estão implementadas em:
 
 ```text
 sql/consultas.sql
 ```
 
-## Decisões que serão fechadas junto com `consultas.sql`
+## Decisões das consultas finais
 
-Duas escolhas do enunciado dependem da consulta final e **ainda estão pendentes de definição pelo grupo**:
+**Análise 3 — corte mínimo de combates.** Adotou-se um mínimo de **30 combates** para que um Pokémon entre no ranking. A quantidade de combates por Pokémon é bastante desigual (média de ~125, mas com muitos abaixo de 10), e uma taxa de vitórias calculada sobre poucos combates é ruído estatístico — um Pokémon com 3 combates e 100% de vitória não indica desempenho real. O corte de 30 equilibra representatividade e amostra suficiente.
 
-* **Análise 3 — corte mínimo de combates:** será definido um número mínimo de confrontos para que um Pokémon entre no ranking. A coluna com a quantidade de combates permanece materializada em `gold.ranking_pokemon`; o corte será aplicado apenas na consulta final, permitindo alterá-lo sem reconstruir a Gold.
-* **Análise 5 — faixas de diferença de velocidade:** a Gold já trabalha no grão de faixa de velocidade, mas os limites adotados devem ser registrados e justificados quando a consulta final for concluída.
+A coluna `num_combates` permanece materializada em `gold.ranking_pokemon`, e o corte é aplicado **apenas na consulta final**, o que permite alterá-lo sem reconstruir a Gold. A quantidade de combates é exibida ao lado da taxa de vitórias, conforme exige o enunciado.
 
-Esses valores **não são inventados neste README** antes da implementação das consultas.
+**Análise 5 — faixas de diferença de velocidade.** Adotaram-se **5 faixas**, com cortes em ±50:
 
-O documento deve ser atualizado assim que o grupo fechar os critérios.
+```text
+muito mais lento   (diferença ≤ -50)
+mais lento         (-49 a -1)
+mesma velocidade   (0)
+mais rápido        (1 a 49)
+muito mais rápido  (≥ 50)
+```
+
+A faixa central isolada (diferença = 0) serve de referência neutra, e o corte em ±50 separa uma vantagem de velocidade marginal de uma vantagem expressiva. A simetria das faixas permite comparar diretamente os dois lados do confronto.
 
 ---
 
@@ -1008,7 +1021,7 @@ A célula `(A, B)` representa a proporção de confrontos entre os tipos primár
 
 O mesmo confronto contribui de forma complementar para `(A, B)` e `(B, A)`.
 
-Os resultados e suas interpretações serão registrados posteriormente em `RELATORIO.md`, após a conclusão de `sql/consultas.sql`.
+Os resultados e suas interpretações são registrados em `RELATORIO.md`.
 
 ---
 
@@ -1025,8 +1038,9 @@ Os resultados e suas interpretações serão registrados posteriormente em `RELA
 | Modelo dimensional  | ✅ Concluído          |
 | Conciliação (R4)    | ✅ Concluída          |
 | PostgreSQL / Gold   | ✅ Concluída          |
-| Consultas SQL       | ⏳ Em desenvolvimento |
-| Relatório final     | ⏳ Após as consultas  |
+| Consultas SQL       | ✅ Concluída          |
+| Relatório final     | ⏳ Em desenvolvimento |
 
 ---
 
+EP01 — Ciência de Dados
