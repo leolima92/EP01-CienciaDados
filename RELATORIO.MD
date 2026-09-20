@@ -67,3 +67,73 @@ Esta análise traça o perfil tático de cada tipo primário com base em seus at
 
 ---
 
+## Análises sobre as batalhas (Gold)
+
+### Análise 3: Taxa de vitórias por Pokémon (10 Maiores e 10 Menores)
+
+**Top 10 (Maiores taxas de vitória)**
+
+| Nome | Tipo Primário | Combates | Vitórias | Taxa de Vitórias |
+| --- | --- | --- | --- | --- |
+| Mega Aerodactyl | rock | 129 | 127 | 98,45% |
+| Weavile | dark | 119 | 116 | 97,48% |
+| Tornadus Therian Forme | flying | 125 | 121 | 96,80% |
+| Mega Beedrill | bug | 119 | 115 | 96,64% |
+| Aerodactyl | rock | 141 | 136 | 96,45% |
+| Mega Lopunny | normal | 129 | 124 | 96,12% |
+| Greninja | water | 127 | 122 | 96,06% |
+| Meloetta Pirouette Forme | normal | 123 | 118 | 95,93% |
+| Mega Mewtwo Y | psychic | 125 | 119 | 95,20% |
+| Mega Sharpedo | water | 120 | 114 | 95,00% |
+
+**Bottom 10 (Menores taxas de vitória)**
+
+| Nome | Tipo Primário | Combates | Vitórias | Taxa de Vitórias |
+| --- | --- | --- | --- | --- |
+| Shuckle | bug | 135 | 0 | 0,00% |
+| Silcoon | bug | 138 | 3 | 2,17% |
+| Togepi | fairy | 122 | 3 | 2,46% |
+| Solosis | psychic | 129 | 4 | 3,10% |
+| Slugma | fire | 123 | 4 | 3,25% |
+| Munna | psychic | 128 | 5 | 3,91% |
+| Igglybuff | normal | 115 | 5 | 4,35% |
+| Wynaut | psychic | 130 | 6 | 4,62% |
+| Wooper | water | 125 | 6 | 4,80% |
+| Cascoon | bug | 133 | 7 | 5,26% |
+
+**Interpretação:**
+O corte de 30 combates eliminou distorções estatísticas, garantindo que o ranking reflita o desempenho real. O Top 10 revela um padrão: o domínio quase absoluto de formas alternativas (Megas e outras Formas especiais) e de Pokémons com o atributo Velocidade alto. Mega Aerodactyl, Weavile e Greninja estão entre os atacantes mais rápidos do jogo. Podemos concluir que atacar primeiro (velocidade maior) é um grande fator pra determinar a vitória
+
+Nos 10 menores, temos o inverso. Encontramos predominantemente Pokémons em estágios iniciais de evolução (Togepi, Igglybuff) ou casulos (Silcoon, Cascoon). O maior destaque, no entanto, é Shuckle: apesar de possuir as maiores defesas do jogo, sua velocidade é uma das mais baixas e seu poder ofensivo é baixíssimo. O fato de Shuckle ter perdido todos os 135 combates que disputou (taxa de 0%) confirma que uma estratégia puramente defensiva falha miseravelmente no algoritmo que gera as batalhas.
+
+---
+
+### Análise 4: Taxa de vitórias por tipo primário
+
+| Tipo Primário | Combates | Vitórias | Taxa de Vitórias |
+| --- | --- | --- | --- |
+| flying | 478 | 362 | 75,73% |
+| dark | 3845 | 2447 | 63,64% |
+| dragon | 3932 | 2490 | 63,33% |
+| electric | 5346 | 3370 | 63,04% |
+| fire | 6552 | 3802 | 58,03% |
+| psychic | 7320 | 3998 | 54,62% |
+| normal | 12098 | 6518 | 53,88% |
+| ground | 3889 | 2088 | 53,69% |
+| ghost | 3908 | 1877 | 48,03% |
+| water | 14041 | 6569 | 46,78% |
+| fighting | 3198 | 1458 | 45,59% |
+| ice | 3079 | 1357 | 44,07% |
+| grass | 8426 | 3707 | 43,99% |
+| bug | 8760 | 3772 | 43,06% |
+| poison | 3654 | 1571 | 42,99% |
+| steel | 3546 | 1523 | 42,95% |
+| rock | 5669 | 2299 | 40,55% |
+| fairy | 2151 | 707 | 32,87% |
+
+**Interpretação:**
+Existe uma clara diferença de desempenho entre os tipos na simulação de batalhas. O tipo **Voador** apresenta um domínio estatístico (75,73% de vitórias). Isso se explica pelo fato mostrado na Análise 1: existem apenas 4 Pokémon com Voador como tipo primário (frequentemente formas de lendários poderosos como Tornadus), o que puxa a média do tipo agressivamente para cima e consolida a alta velocidade que o tipo demonstrou na Análise 2.
+
+Logo em seguida, observamos os tipos **Sombrio**, **Dragão** e **Elétrico** superando a marca de 60%. Esses tipos compartilham perfis ofensivos e ágeis. Em contraste, os tipos puramente defensivos ou lentos, como **Aço** e **Pedra**, ocupam as últimas posições (40 a 42%), apesar de terem os maiores status de defesa do jogo. O tipo **Fada** ocupa a última posição (32,87%), o que é coerente com a Análise 2, onde este tipo registrou a pior média de velocidade (48,6). Esses resultados confirmam a conclusão da análise anterior: a simulação de combate penaliza Pokémon lentos e recompensa a agilidade e poder de ataque.
+
+---
