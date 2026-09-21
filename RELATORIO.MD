@@ -137,3 +137,452 @@ Existe uma clara diferença de desempenho entre os tipos na simulação de batal
 Logo em seguida, observamos os tipos **Sombrio**, **Dragão** e **Elétrico** superando a marca de 60%. Esses tipos compartilham perfis ofensivos e ágeis. Em contraste, os tipos puramente defensivos ou lentos, como **Aço** e **Pedra**, ocupam as últimas posições (40 a 42%), apesar de terem os maiores status de defesa do jogo. O tipo **Fada** ocupa a última posição (32,87%), o que é coerente com a Análise 2, onde este tipo registrou a pior média de velocidade (48,6). Esses resultados confirmam a conclusão da análise anterior: a simulação de combate penaliza Pokémon lentos e recompensa a agilidade e poder de ataque.
 
 ---
+
+### Análise 5: Relação entre diferença de velocidade e vitória
+
+| Faixa de Diferença de Velocidade | Combates | Taxa de Vitórias |
+| --- | --- | --- |
+| muito mais lento (<= -50) | 12.407 | 9,40% |
+| mais lento (-49 a -1) | 36.265 | 4,98% |
+| mesma velocidade (0) | 2.656 | 50,00% |
+| mais rápido (1 a 49) | 36.265 | 95,02% |
+| muito mais rápido (>= 50) | 12.407 | 90,60% |
+
+**Interpretação:**
+Nessa análise podemos observar a comprovação que a velocidade não é apenas uma vantagem, mas sim o fator determinante para o resultado dos combates.
+
+Quando os Pokémons têm a mesma velocidade, a taxa de vitórias é de exatamente 50%, indicando um cenário de "coinflip" (empate estatístico). No entanto, basta ser um pouco mais rápido (diferença de 1 a 49 pontos) para a taxa de vitórias saltar para absurdos **95,02%**. Nas faixas extremas ("muito mais lento" e "muito mais rápido"), há uma leve regressão para o centro (9,40% e 90,60%, respectivamente). Isso provavelmente ocorre porque Pokémon extremamente rápidos costumam ser "glass canons" (muito ataque e pouca defesa, podendo perder para ataques de prioridade) e Pokémon extremamente lentos costumam ser "tanques" colossais capazes de resistir ao primeiro golpe e revidar. Ainda assim, a conclusão é quem ataca primeiro quase sempre vence.
+
+---
+
+### Análise 6: Relação entre vantagem de tipo e vitória
+
+| Multiplicador (Vantagem de Tipo) | Combates | Taxa de Vitórias |
+| --- | --- | --- |
+| 0.0 (Imunidade) | 1.824 | 31,69% |
+| 0.5 (Desvantagem / Resistência) | 18.976 | 47,54% |
+| 1.0 (Dano Neutro) | 64.651 | 50,05% |
+| 2.0 (Vantagem / Super Efetivo) | 14.333 | 55,34% |
+
+**Interpretação:**
+Nesta análise cruzamos os resultados do simulador com a tabela de efetividade oficial da PokéAPI (considerando o tipo primário). O resultado mostra quanto maior o multiplicador de dano, maior a taxa de vitórias (crescendo de 31,69% para 55,34%).
+
+Porém, o impacto da vantagem de tipo é muito fraco quando comparado ao impacto da velocidade (visto na Análise 5). O caso mais gritante é o multiplicador 0.0 (imunidade): na mecânica real do jogo, um ataque desse tipo não causa dano algum, mas aqui o Pokémon teoricamente "imune" ainda perde 31,69% das vezes. Da mesma forma, ter o dobro de dano a seu favor (2.0) só garante vitória em cerca de 55% dos casos, um número muito pouco acima da média neutra. Isso indica que a lógica por trás de `combats.csv` valorizou excessivamente os *status* brutos (principalmente a velocidade e o poder ofensivo), deixando as interações de tipos da franquia em segundo plano.
+
+---
+Aqui está a formatação para a Análise 7, focando no destaque que a query puxou (onde vitória e efetividade divergem).
+
+*Como a matriz de 18x18 completa geraria uma tabela absurdamente grande (324 linhas), a boa prática de relatórios é não colar a matriz inteira na tela (a menos que o professor exija). Em vez disso, focamos na tabela do "Destaque" (divergências), que é onde está a verdadeira informação de negócio.*
+
+---
+
+### Análise 7: Matriz de confronto entre tipos (18x18) e Divergências
+
+| Tipo Atacante | Tipo Defensor | Combates | Taxa de Vitórias | Multiplicador |
+| --- | --- | --- | --- | --- |
+| bug | bug | 772 | 50,00% | 1.0 |
+| bug | dark | 309 | 36,25% | 2.0 |
+| bug | dragon | 342 | 28,36% | 1.0 |
+| bug | electric | 473 | 26,64% | 1.0 |
+| bug | fairy | 190 | 61,05% | 0.5 |
+| bug | fighting | 259 | 44,02% | 0.5 |
+| bug | fire | 599 | 33,06% | 0.5 |
+| bug | flying | 38 | 21,05% | 0.5 |
+| bug | ghost | 356 | 45,51% | 0.5 |
+| bug | grass | 764 | 51,83% | 2.0 |
+| bug | ground | 335 | 47,76% | 1.0 |
+| bug | ice | 295 | 48,81% | 1.0 |
+| bug | normal | 1066 | 38,65% | 1.0 |
+| bug | poison | 324 | 46,60% | 0.5 |
+| bug | psychic | 646 | 42,41% | 2.0 |
+| bug | rock | 487 | 45,79% | 1.0 |
+| bug | steel | 289 | 47,06% | 0.5 |
+| bug | water | 1204 | 46,10% | 1.0 |
+| dark | bug | 309 | 63,75% | 1.0 |
+| dark | dark | 148 | 50,00% | 0.5 |
+| dark | dragon | 149 | 51,68% | 1.0 |
+| dark | electric | 210 | 44,76% | 1.0 |
+| dark | fairy | 83 | 79,52% | 0.5 |
+| dark | fighting | 97 | 53,61% | 0.5 |
+| dark | fire | 249 | 51,00% | 1.0 |
+| dark | flying | 23 | 26,09% | 1.0 |
+| dark | ghost | 142 | 66,90% | 2.0 |
+| dark | grass | 332 | 72,29% | 1.0 |
+| dark | ground | 148 | 60,81% | 1.0 |
+| dark | ice | 119 | 68,07% | 1.0 |
+| dark | normal | 495 | 54,75% | 1.0 |
+| dark | poison | 125 | 66,40% | 1.0 |
+| dark | psychic | 291 | 94,50% | 2.0 |
+| dark | rock | 246 | 73,58% | 1.0 |
+| dark | steel | 153 | 67,32% | 1.0 |
+| dark | water | 520 | 64,42% | 1.0 |
+| dragon | bug | 342 | 71,64% | 1.0 |
+| dragon | dark | 149 | 48,32% | 1.0 |
+| dragon | dragon | 150 | 50,00% | 2.0 |
+| dragon | electric | 178 | 54,49% | 1.0 |
+| dragon | fairy | 84 | 10,71% | 0.0 (Imunidade) |
+| dragon | fighting | 121 | 66,94% | 1.0 |
+| dragon | fire | 252 | 56,75% | 1.0 |
+| dragon | flying | 22 | 18,18% | 1.0 |
+| dragon | ghost | 153 | 68,63% | 1.0 |
+| dragon | grass | 313 | 69,01% | 1.0 |
+| dragon | ground | 137 | 69,34% | 1.0 |
+| dragon | ice | 116 | 68,97% | 1.0 |
+| dragon | normal | 479 | 57,41% | 1.0 |
+| dragon | poison | 173 | 68,79% | 1.0 |
+| dragon | psychic | 276 | 53,62% | 1.0 |
+| dragon | rock | 260 | 74,62% | 1.0 |
+| dragon | steel | 141 | 79,43% | 0.5 |
+| dragon | water | 584 | 71,58% | 1.0 |
+| electric | bug | 473 | 73,36% | 1.0 |
+| electric | dark | 210 | 55,24% | 1.0 |
+| electric | dragon | 178 | 45,51% | 0.5 |
+| electric | electric | 268 | 50,00% | 0.5 |
+| electric | fairy | 132 | 81,82% | 1.0 |
+| electric | fighting | 175 | 69,71% | 1.0 |
+| electric | fire | 327 | 59,94% | 1.0 |
+| electric | flying | 16 | 31,25% | 2.0 |
+| electric | ghost | 214 | 76,17% | 1.0 |
+| electric | grass | 459 | 66,67% | 0.5 |
+| electric | ground | 218 | 9,63% | 0.0 (Imunidade) |
+| electric | ice | 163 | 71,17% | 1.0 |
+| electric | normal | 676 | 61,83% | 1.0 |
+| electric | poison | 201 | 72,14% | 1.0 |
+| electric | psychic | 422 | 56,64% | 1.0 |
+| electric | rock | 286 | 71,33% | 1.0 |
+| electric | steel | 211 | 71,09% | 1.0 |
+| electric | water | 713 | 69,85% | 2.0 |
+| fairy | bug | 190 | 38,95% | 1.0 |
+| fairy | dark | 83 | 20,48% | 2.0 |
+| fairy | dragon | 84 | 89,29% | 2.0 |
+| fairy | electric | 132 | 18,18% | 1.0 |
+| fairy | fairy | 50 | 50,00% | 1.0 |
+| fairy | fighting | 59 | 35,59% | 2.0 |
+| fairy | fire | 142 | 21,83% | 0.5 |
+| fairy | flying | 11 | 27,27% | 1.0 |
+| fairy | ghost | 62 | 45,16% | 1.0 |
+| fairy | grass | 203 | 29,06% | 1.0 |
+| fairy | ground | 82 | 29,27% | 1.0 |
+| fairy | ice | 60 | 40,00% | 1.0 |
+| fairy | normal | 247 | 24,29% | 1.0 |
+| fairy | poison | 77 | 29,87% | 0.5 |
+| fairy | psychic | 138 | 26,81% | 1.0 |
+| fairy | rock | 140 | 40,71% | 1.0 |
+| fairy | steel | 67 | 37,31% | 0.5 |
+| fairy | water | 321 | 31,15% | 1.0 |
+| fighting | bug | 259 | 55,98% | 0.5 |
+| fighting | dark | 97 | 46,39% | 2.0 |
+| fighting | dragon | 121 | 33,06% | 1.0 |
+| fighting | electric | 175 | 30,29% | 1.0 |
+| fighting | fairy | 59 | 64,41% | 0.5 |
+| fighting | fighting | 126 | 50,00% | 1.0 |
+| fighting | fire | 208 | 33,65% | 1.0 |
+| fighting | flying | 10 | 0,00% | 0.5 |
+| fighting | ghost | 124 | 13,71% | 0.0 (Imunidade) |
+| fighting | grass | 260 | 55,77% | 1.0 |
+| fighting | ground | 122 | 48,36% | 1.0 |
+| fighting | ice | 90 | 57,78% | 2.0 |
+| fighting | normal | 431 | 42,46% | 2.0 |
+| fighting | poison | 127 | 54,33% | 0.5 |
+| fighting | psychic | 231 | 35,93% | 0.5 |
+| fighting | rock | 186 | 66,67% | 2.0 |
+| fighting | steel | 109 | 58,72% | 2.0 |
+| fighting | water | 461 | 45,12% | 1.0 |
+| fire | bug | 599 | 66,94% | 2.0 |
+| fire | dark | 249 | 49,00% | 1.0 |
+| fire | dragon | 252 | 43,25% | 0.5 |
+| fire | electric | 327 | 40,06% | 1.0 |
+| fire | fairy | 142 | 78,17% | 1.0 |
+| fire | fighting | 208 | 66,35% | 1.0 |
+| fire | fire | 430 | 50,00% | 0.5 |
+| fire | flying | 29 | 27,59% | 1.0 |
+| fire | ghost | 244 | 64,34% | 1.0 |
+| fire | grass | 547 | 70,38% | 2.0 |
+| fire | ground | 266 | 51,88% | 1.0 |
+| fire | ice | 196 | 68,37% | 2.0 |
+| fire | normal | 861 | 54,12% | 1.0 |
+| fire | poison | 225 | 67,11% | 1.0 |
+| fire | psychic | 448 | 47,99% | 1.0 |
+| fire | rock | 358 | 60,34% | 0.5 |
+| fire | steel | 232 | 68,53% | 2.0 |
+| fire | water | 931 | 58,43% | 0.5 |
+| flying | bug | 38 | 78,95% | 2.0 |
+| flying | dark | 23 | 73,91% | 1.0 |
+| flying | dragon | 22 | 81,82% | 1.0 |
+| flying | electric | 16 | 68,75% | 0.5 |
+| flying | fairy | 11 | 72,73% | 1.0 |
+| flying | fighting | 10 | 100,00% | 2.0 |
+| flying | fire | 29 | 72,41% | 1.0 |
+| flying | flying | 2 | 50,00% | 1.0 |
+| flying | ghost | 23 | 82,61% | 1.0 |
+| flying | grass | 36 | 75,00% | 2.0 |
+| flying | ground | 19 | 89,47% | 1.0 |
+| flying | ice | 20 | 80,00% | 1.0 |
+| flying | normal | 61 | 72,13% | 1.0 |
+| flying | poison | 20 | 80,00% | 1.0 |
+| flying | psychic | 35 | 60,00% | 1.0 |
+| flying | rock | 24 | 66,67% | 0.5 |
+| flying | steel | 21 | 85,71% | 0.5 |
+| flying | water | 68 | 76,47% | 1.0 |
+| ghost | bug | 356 | 54,49% | 1.0 |
+| ghost | dark | 142 | 33,10% | 0.5 |
+| ghost | dragon | 153 | 31,37% | 1.0 |
+| ghost | electric | 214 | 23,83% | 1.0 |
+| ghost | fairy | 62 | 54,84% | 1.0 |
+| ghost | fighting | 124 | 86,29% | 1.0 |
+| ghost | fire | 244 | 35,66% | 1.0 |
+| ghost | flying | 23 | 17,39% | 1.0 |
+| ghost | ghost | 166 | 50,00% | 2.0 |
+| ghost | grass | 351 | 49,29% | 1.0 |
+| ghost | ground | 159 | 46,54% | 1.0 |
+| ghost | ice | 123 | 50,41% | 1.0 |
+| ghost | normal | 484 | 50,62% | 0.0 (Imunidade) |
+| ghost | poison | 145 | 57,24% | 1.0 |
+| ghost | psychic | 289 | 44,98% | 2.0 |
+| ghost | rock | 208 | 61,54% | 1.0 |
+| ghost | steel | 158 | 55,06% | 1.0 |
+| ghost | water | 500 | 46,80% | 1.0 |
+| grass | bug | 764 | 48,17% | 0.5 |
+| grass | dark | 332 | 27,71% | 1.0 |
+| grass | dragon | 313 | 30,99% | 0.5 |
+| grass | electric | 459 | 33,33% | 1.0 |
+| grass | fairy | 203 | 70,94% | 1.0 |
+| grass | fighting | 260 | 44,23% | 1.0 |
+| grass | fire | 547 | 29,62% | 0.5 |
+| grass | flying | 36 | 25,00% | 0.5 |
+| grass | ghost | 351 | 50,71% | 1.0 |
+| grass | grass | 708 | 50,00% | 0.5 |
+| grass | ground | 318 | 49,06% | 2.0 |
+| grass | ice | 244 | 41,80% | 1.0 |
+| grass | normal | 984 | 39,94% | 1.0 |
+| grass | poison | 301 | 43,52% | 0.5 |
+| grass | psychic | 632 | 37,34% | 1.0 |
+| grass | rock | 482 | 56,85% | 2.0 |
+| grass | steel | 274 | 50,36% | 0.5 |
+| grass | water | 1208 | 49,83% | 2.0 |
+| ground | bug | 335 | 52,24% | 0.5 |
+| ground | dark | 148 | 39,19% | 1.0 |
+| ground | dragon | 137 | 30,66% | 1.0 |
+| ground | electric | 218 | 90,37% | 2.0 |
+| ground | fairy | 82 | 70,73% | 1.0 |
+| ground | fighting | 122 | 51,64% | 1.0 |
+| ground | fire | 266 | 48,12% | 2.0 |
+| ground | flying | 19 | 10,53% | 0.0 (Imunidade) |
+| ground | ghost | 159 | 53,46% | 1.0 |
+| ground | grass | 318 | 50,94% | 0.5 |
+| ground | ground | 144 | 50,00% | 1.0 |
+| ground | ice | 122 | 48,36% | 1.0 |
+| ground | normal | 472 | 48,94% | 1.0 |
+| ground | poison | 149 | 61,74% | 2.0 |
+| ground | psychic | 274 | 50,36% | 1.0 |
+| ground | rock | 229 | 64,19% | 2.0 |
+| ground | steel | 122 | 62,30% | 2.0 |
+| ground | water | 571 | 53,06% | 1.0 |
+| ice | bug | 295 | 51,19% | 1.0 |
+| ice | dark | 119 | 31,93% | 1.0 |
+| ice | dragon | 116 | 31,03% | 2.0 |
+| ice | electric | 163 | 28,83% | 1.0 |
+| ice | fairy | 60 | 60,00% | 1.0 |
+| ice | fighting | 90 | 42,22% | 1.0 |
+| ice | fire | 196 | 31,63% | 0.5 |
+| ice | flying | 20 | 20,00% | 2.0 |
+| ice | ghost | 123 | 49,59% | 1.0 |
+| ice | grass | 244 | 58,20% | 2.0 |
+| ice | ground | 122 | 51,64% | 2.0 |
+| ice | ice | 94 | 50,00% | 0.5 |
+| ice | normal | 365 | 39,45% | 1.0 |
+| ice | poison | 99 | 49,49% | 1.0 |
+| ice | psychic | 224 | 37,50% | 1.0 |
+| ice | rock | 182 | 48,90% | 1.0 |
+| ice | steel | 119 | 47,06% | 0.5 |
+| ice | water | 445 | 47,19% | 0.5 |
+| normal | bug | 1066 | 61,35% | 1.0 |
+| normal | dark | 495 | 45,25% | 1.0 |
+| normal | dragon | 479 | 42,59% | 1.0 |
+| normal | electric | 676 | 38,17% | 1.0 |
+| normal | fairy | 247 | 75,71% | 1.0 |
+| normal | fighting | 431 | 57,54% | 1.0 |
+| normal | fire | 861 | 45,88% | 1.0 |
+| normal | flying | 61 | 27,87% | 1.0 |
+| normal | ghost | 484 | 49,38% | 0.0 (Imunidade) |
+| normal | grass | 984 | 60,06% | 1.0 |
+| normal | ground | 472 | 51,06% | 1.0 |
+| normal | ice | 365 | 60,55% | 1.0 |
+| normal | normal | 1416 | 50,00% | 1.0 |
+| normal | poison | 432 | 63,89% | 1.0 |
+| normal | psychic | 811 | 45,25% | 1.0 |
+| normal | rock | 682 | 60,56% | 0.5 |
+| normal | steel | 422 | 57,82% | 0.5 |
+| normal | water | 1702 | 60,58% | 1.0 |
+| poison | bug | 324 | 53,40% | 1.0 |
+| poison | dark | 125 | 33,60% | 1.0 |
+| poison | dragon | 173 | 31,21% | 1.0 |
+| poison | electric | 201 | 27,86% | 1.0 |
+| poison | fairy | 77 | 70,13% | 2.0 |
+| poison | fighting | 127 | 45,67% | 1.0 |
+| poison | fire | 225 | 32,89% | 1.0 |
+| poison | flying | 20 | 20,00% | 1.0 |
+| poison | ghost | 145 | 42,76% | 0.5 |
+| poison | grass | 301 | 56,48% | 2.0 |
+| poison | ground | 149 | 38,26% | 0.5 |
+| poison | ice | 99 | 50,51% | 1.0 |
+| poison | normal | 432 | 36,11% | 1.0 |
+| poison | poison | 148 | 50,00% | 0.5 |
+| poison | psychic | 270 | 38,89% | 1.0 |
+| poison | rock | 194 | 60,82% | 0.5 |
+| poison | steel | 120 | 24,17% | 0.0 (Imunidade) |
+| poison | water | 518 | 45,37% | 1.0 |
+| psychic | bug | 646 | 57,59% | 1.0 |
+| psychic | dark | 291 | 5,50% | 0.0 (Imunidade) |
+| psychic | dragon | 276 | 46,38% | 1.0 |
+| psychic | electric | 422 | 43,36% | 1.0 |
+| psychic | fairy | 138 | 73,19% | 1.0 |
+| psychic | fighting | 231 | 64,07% | 2.0 |
+| psychic | fire | 448 | 52,01% | 1.0 |
+| psychic | flying | 35 | 40,00% | 1.0 |
+| psychic | ghost | 289 | 55,02% | 1.0 |
+| psychic | grass | 632 | 62,66% | 1.0 |
+| psychic | ground | 274 | 49,64% | 1.0 |
+| psychic | ice | 224 | 62,50% | 1.0 |
+| psychic | normal | 811 | 54,75% | 1.0 |
+| psychic | poison | 270 | 61,11% | 2.0 |
+| psychic | psychic | 518 | 50,00% | 0.5 |
+| psychic | rock | 445 | 62,92% | 1.0 |
+| psychic | steel | 279 | 55,20% | 0.5 |
+| psychic | water | 1086 | 61,60% | 1.0 |
+| rock | bug | 487 | 54,21% | 2.0 |
+| rock | dark | 246 | 26,42% | 1.0 |
+| rock | dragon | 260 | 25,38% | 1.0 |
+| rock | electric | 286 | 28,67% | 1.0 |
+| rock | fairy | 140 | 59,29% | 1.0 |
+| rock | fighting | 186 | 33,33% | 0.5 |
+| rock | fire | 358 | 39,66% | 2.0 |
+| rock | flying | 24 | 33,33% | 2.0 |
+| rock | ghost | 208 | 38,46% | 1.0 |
+| rock | grass | 482 | 43,15% | 1.0 |
+| rock | ground | 229 | 35,81% | 0.5 |
+| rock | ice | 182 | 51,10% | 2.0 |
+| rock | normal | 682 | 39,44% | 1.0 |
+| rock | poison | 194 | 39,18% | 1.0 |
+| rock | psychic | 445 | 37,08% | 1.0 |
+| rock | rock | 314 | 50,00% | 1.0 |
+| rock | steel | 179 | 48,04% | 0.5 |
+| rock | water | 759 | 40,97% | 1.0 |
+| steel | bug | 289 | 52,94% | 1.0 |
+| steel | dark | 153 | 32,68% | 1.0 |
+| steel | dragon | 141 | 20,57% | 1.0 |
+| steel | electric | 211 | 28,91% | 0.5 |
+| steel | fairy | 67 | 62,69% | 2.0 |
+| steel | fighting | 109 | 41,28% | 1.0 |
+| steel | fire | 232 | 31,47% | 0.5 |
+| steel | flying | 21 | 14,29% | 1.0 |
+| steel | ghost | 158 | 44,94% | 1.0 |
+| steel | grass | 274 | 49,64% | 1.0 |
+| steel | ground | 122 | 37,70% | 1.0 |
+| steel | ice | 119 | 52,94% | 2.0 |
+| steel | normal | 422 | 42,18% | 1.0 |
+| steel | poison | 120 | 75,83% | 1.0 |
+| steel | psychic | 279 | 44,80% | 1.0 |
+| steel | rock | 179 | 51,96% | 2.0 |
+| steel | steel | 146 | 50,00% | 0.5 |
+| steel | water | 497 | 38,23% | 0.5 |
+| water | bug | 1204 | 53,90% | 1.0 |
+| water | dark | 520 | 35,58% | 1.0 |
+| water | dragon | 584 | 28,42% | 0.5 |
+| water | electric | 713 | 30,15% | 1.0 |
+| water | fairy | 321 | 68,85% | 1.0 |
+| water | fighting | 461 | 54,88% | 1.0 |
+| water | fire | 931 | 41,57% | 2.0 |
+| water | flying | 68 | 23,53% | 1.0 |
+| water | ghost | 500 | 53,20% | 1.0 |
+| water | grass | 1208 | 50,17% | 0.5 |
+| water | ground | 571 | 46,94% | 2.0 |
+| water | ice | 445 | 52,81% | 1.0 |
+| water | normal | 1702 | 39,42% | 1.0 |
+| water | poison | 518 | 54,63% | 1.0 |
+| water | psychic | 1086 | 38,40% | 1.0 |
+| water | rock | 759 | 59,03% | 2.0 |
+| water | steel | 497 | 61,77% | 1.0 |
+| water | water | 1942 | 50,00% | 0.5 |
+
+**Destaque: Posições onde vitória e efetividade divergem**
+*(Cenários onde o atacante tem desvantagem [Mult < 1] mas vence na maioria das vezes, ou onde tem vantagem [Mult > 1] mas perde na maioria das vezes)*
+
+| Tipo Atacante | Tipo Defensor | Combates | Taxa de Vitórias | Multiplicador |
+| --- | --- | --- | --- | --- |
+| flying | steel | 21 | 85,71% | 0.5 |
+| dark | fairy | 83 | 79,52% | 0.5 |
+| dragon | steel | 141 | 79,43% | 0.5 |
+| flying | electric | 16 | 68,75% | 0.5 |
+| electric | grass | 459 | 66,67% | 0.5 |
+| flying | rock | 24 | 66,67% | 0.5 |
+| fighting | fairy | 59 | 64,41% | 0.5 |
+| bug | fairy | 190 | 61,05% | 0.5 |
+| poison | rock | 194 | 60,82% | 0.5 |
+| normal | rock | 682 | 60,56% | 0.5 |
+| fire | rock | 358 | 60,34% | 0.5 |
+| fire | water | 931 | 58,43% | 0.5 |
+| normal | steel | 422 | 57,82% | 0.5 |
+| fighting | bug | 259 | 55,98% | 0.5 |
+| psychic | steel | 279 | 55,20% | 0.5 |
+| fighting | poison | 127 | 54,33% | 0.5 |
+| dark | fighting | 97 | 53,61% | 0.5 |
+| ground | bug | 335 | 52,24% | 0.5 |
+| ground | grass | 318 | 50,94% | 0.5 |
+| ghost | normal | 484 | 50,62% | 0.0 (Imunidade) |
+| grass | steel | 274 | 50,36% | 0.5 |
+| water | grass | 1208 | 50,17% | 0.5 |
+| grass | water | 1208 | 49,83% | 2.0 |
+| grass | ground | 318 | 49,06% | 2.0 |
+| ground | fire | 266 | 48,12% | 2.0 |
+| water | ground | 571 | 46,94% | 2.0 |
+| fighting | dark | 97 | 46,39% | 2.0 |
+| ghost | psychic | 289 | 44,98% | 2.0 |
+| fighting | normal | 431 | 42,46% | 2.0 |
+| bug | psychic | 646 | 42,41% | 2.0 |
+| water | fire | 931 | 41,57% | 2.0 |
+| rock | fire | 358 | 39,66% | 2.0 |
+| bug | dark | 309 | 36,25% | 2.0 |
+| fairy | fighting | 59 | 35,59% | 2.0 |
+| rock | flying | 24 | 33,33% | 2.0 |
+| electric | flying | 16 | 31,25% | 2.0 |
+| ice | dragon | 116 | 31,03% | 2.0 |
+| fairy | dark | 83 | 20,48% | 2.0 |
+| ice | flying | 20 | 20,00% | 2.0 |
+
+**Interpretação:**
+Esta análise isola os casos onde a simulação "quebra" a mecânica clássica da franquia.
+
+No topo da tabela, vemos Pokémon vencendo a maioria dos confrontos mesmo quando seus ataques causam apenas metade do dano (Multiplicador = 0.5). O caso mais extremo é **Voador** contra **Aço** (85,71% de vitória para Voador). Sabendo pela Análise 2 que Voador é o tipo mais rápido do jogo e Aço é o penúltimo mais lento, fica evidente que um Pokémon ágil compensa a resistência do oponente desferindo o primeiro ataque, possivelmente o derrotando antes que ele possa reagir.
+
+Ainda mais grave é o caso do atacante **Fantasma** contra o defensor **Normal**. Na mecânica real do Pokemon, ataques Fantasma não afetam Pokémon Normais (Multiplicador = 0.0), e ainda assim o tipo Fantasma venceu **50,62%** das 484 batalhas desse cruzamento. Isso prova de forma definitiva que o programa que gerou os dados do arquivo `combats.csv` **não implementou corretamente a matriz de imunidades do jogo**, tratando esse confronto como um embate neutro.
+
+Por fim, a base da tabela mostra tipos com vantagem (Multiplicador = 2.0) perdendo a maioria dos confrontos. Tipos classicamente frágeis e defensivamente fracos (Gelo e Fada) frequentemente perdem para os tipos sobre os quais deveriam ter vantagem (Dragão e Sombrio), simplesmente porque não sobrevivem ao primeiro turno de ataque para usar seu multiplicador a seu favor.
+
+---
+
+Aqui está a formatação e a interpretação para a sua Análise 8. Essa foi uma sacada excelente do seu grupo para fechar o trabalho, pois ela usa aquele atributo derivado que vocês criaram na carga do *Silver*!
+
+Pode copiar e colar no seu `RELATORIO.md`:
+
+---
+
+### Análise 8 (Proposta do Grupo): Taxa de vitórias por categoria de raridade
+
+**Pergunta de Negócio:** Pokémon de categorias mais raras (Lendários e Míticos) realmente apresentam um desempenho superior nas batalhas em relação aos Pokémon comuns?
+
+| Categoria de Raridade | Combates | Taxa de Vitórias |
+| --- | --- | --- |
+| Mítico | 3.075 | 80,36% |
+| Lendário | 6.373 | 77,06% |
+| Comum | 88.256 | 47,50% |
+| Bebê | 2.188 | 27,88% |
+
+**Interpretação:**
+A análise confirma a hipótese levantada pelo nosso grupo: a raridade de um Pokémon implica em uma vantagem nos combates.
+
+Pokémon **Míticos** e **Lendários** vencem aproximadamente 8 em cada 10 batalhas que disputam (80,36% e 77,06%, respectivamente). Esse domínio acontece porque a raridade está atrelada a atributos base (status) significativamente maiores do que a média. Como a Análise 5 provou que o algoritmo do simulador recompensa brutalmente atributos brutos (especialmente a velocidade), os Lendários e Míticos levam uma vantagem natural.
+
+Do outro lado, os Pokémon da categoria **Comum** perdem um pouco mais do que ganham (47,50%), o que é esperado, já que essa categoria engloba desde formas evoluídas fortes até formas base muito fracas, puxando a média para baixo. Por fim, os Pokémon classificados como **Bebê** (*Baby*) possuem o pior desempenho da simulação (27,88%), o que é coerente com o design do jogo, visto que são estágios pré-evolutivos com os menores status possíveis.
+
+---

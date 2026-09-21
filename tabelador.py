@@ -1,0 +1,1973 @@
+import json
+
+# Pode colar o seu JSON cru inteiro aqui dentro das três aspas:
+json_data = '''[
+  {
+  "tipo_atacante": "bug",
+  "tipo_defensor": "bug",
+  "num_combates": 772,
+  "taxa_vitorias": 0.5000,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "bug",
+  "tipo_defensor": "dark",
+  "num_combates": 309,
+  "taxa_vitorias": 0.3625,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "bug",
+  "tipo_defensor": "dragon",
+  "num_combates": 342,
+  "taxa_vitorias": 0.2836,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "bug",
+  "tipo_defensor": "electric",
+  "num_combates": 473,
+  "taxa_vitorias": 0.2664,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "bug",
+  "tipo_defensor": "fairy",
+  "num_combates": 190,
+  "taxa_vitorias": 0.6105,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "bug",
+  "tipo_defensor": "fighting",
+  "num_combates": 259,
+  "taxa_vitorias": 0.4402,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "bug",
+  "tipo_defensor": "fire",
+  "num_combates": 599,
+  "taxa_vitorias": 0.3306,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "bug",
+  "tipo_defensor": "flying",
+  "num_combates": 38,
+  "taxa_vitorias": 0.2105,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "bug",
+  "tipo_defensor": "ghost",
+  "num_combates": 356,
+  "taxa_vitorias": 0.4551,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "bug",
+  "tipo_defensor": "grass",
+  "num_combates": 764,
+  "taxa_vitorias": 0.5183,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "bug",
+  "tipo_defensor": "ground",
+  "num_combates": 335,
+  "taxa_vitorias": 0.4776,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "bug",
+  "tipo_defensor": "ice",
+  "num_combates": 295,
+  "taxa_vitorias": 0.4881,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "bug",
+  "tipo_defensor": "normal",
+  "num_combates": 1066,
+  "taxa_vitorias": 0.3865,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "bug",
+  "tipo_defensor": "poison",
+  "num_combates": 324,
+  "taxa_vitorias": 0.4660,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "bug",
+  "tipo_defensor": "psychic",
+  "num_combates": 646,
+  "taxa_vitorias": 0.4241,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "bug",
+  "tipo_defensor": "rock",
+  "num_combates": 487,
+  "taxa_vitorias": 0.4579,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "bug",
+  "tipo_defensor": "steel",
+  "num_combates": 289,
+  "taxa_vitorias": 0.4706,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "bug",
+  "tipo_defensor": "water",
+  "num_combates": 1204,
+  "taxa_vitorias": 0.4610,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dark",
+  "tipo_defensor": "bug",
+  "num_combates": 309,
+  "taxa_vitorias": 0.6375,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dark",
+  "tipo_defensor": "dark",
+  "num_combates": 148,
+  "taxa_vitorias": 0.5000,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "dark",
+  "tipo_defensor": "dragon",
+  "num_combates": 149,
+  "taxa_vitorias": 0.5168,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dark",
+  "tipo_defensor": "electric",
+  "num_combates": 210,
+  "taxa_vitorias": 0.4476,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dark",
+  "tipo_defensor": "fairy",
+  "num_combates": 83,
+  "taxa_vitorias": 0.7952,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "dark",
+  "tipo_defensor": "fighting",
+  "num_combates": 97,
+  "taxa_vitorias": 0.5361,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "dark",
+  "tipo_defensor": "fire",
+  "num_combates": 249,
+  "taxa_vitorias": 0.5100,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dark",
+  "tipo_defensor": "flying",
+  "num_combates": 23,
+  "taxa_vitorias": 0.2609,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dark",
+  "tipo_defensor": "ghost",
+  "num_combates": 142,
+  "taxa_vitorias": 0.6690,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "dark",
+  "tipo_defensor": "grass",
+  "num_combates": 332,
+  "taxa_vitorias": 0.7229,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dark",
+  "tipo_defensor": "ground",
+  "num_combates": 148,
+  "taxa_vitorias": 0.6081,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dark",
+  "tipo_defensor": "ice",
+  "num_combates": 119,
+  "taxa_vitorias": 0.6807,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dark",
+  "tipo_defensor": "normal",
+  "num_combates": 495,
+  "taxa_vitorias": 0.5475,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dark",
+  "tipo_defensor": "poison",
+  "num_combates": 125,
+  "taxa_vitorias": 0.6640,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dark",
+  "tipo_defensor": "psychic",
+  "num_combates": 291,
+  "taxa_vitorias": 0.9450,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "dark",
+  "tipo_defensor": "rock",
+  "num_combates": 246,
+  "taxa_vitorias": 0.7358,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dark",
+  "tipo_defensor": "steel",
+  "num_combates": 153,
+  "taxa_vitorias": 0.6732,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dark",
+  "tipo_defensor": "water",
+  "num_combates": 520,
+  "taxa_vitorias": 0.6442,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dragon",
+  "tipo_defensor": "bug",
+  "num_combates": 342,
+  "taxa_vitorias": 0.7164,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dragon",
+  "tipo_defensor": "dark",
+  "num_combates": 149,
+  "taxa_vitorias": 0.4832,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dragon",
+  "tipo_defensor": "dragon",
+  "num_combates": 150,
+  "taxa_vitorias": 0.5000,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "dragon",
+  "tipo_defensor": "electric",
+  "num_combates": 178,
+  "taxa_vitorias": 0.5449,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dragon",
+  "tipo_defensor": "fairy",
+  "num_combates": 84,
+  "taxa_vitorias": 0.1071,
+  "multiplicador": 0.0
+}, {
+  "tipo_atacante": "dragon",
+  "tipo_defensor": "fighting",
+  "num_combates": 121,
+  "taxa_vitorias": 0.6694,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dragon",
+  "tipo_defensor": "fire",
+  "num_combates": 252,
+  "taxa_vitorias": 0.5675,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dragon",
+  "tipo_defensor": "flying",
+  "num_combates": 22,
+  "taxa_vitorias": 0.1818,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dragon",
+  "tipo_defensor": "ghost",
+  "num_combates": 153,
+  "taxa_vitorias": 0.6863,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dragon",
+  "tipo_defensor": "grass",
+  "num_combates": 313,
+  "taxa_vitorias": 0.6901,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dragon",
+  "tipo_defensor": "ground",
+  "num_combates": 137,
+  "taxa_vitorias": 0.6934,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dragon",
+  "tipo_defensor": "ice",
+  "num_combates": 116,
+  "taxa_vitorias": 0.6897,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dragon",
+  "tipo_defensor": "normal",
+  "num_combates": 479,
+  "taxa_vitorias": 0.5741,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dragon",
+  "tipo_defensor": "poison",
+  "num_combates": 173,
+  "taxa_vitorias": 0.6879,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dragon",
+  "tipo_defensor": "psychic",
+  "num_combates": 276,
+  "taxa_vitorias": 0.5362,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dragon",
+  "tipo_defensor": "rock",
+  "num_combates": 260,
+  "taxa_vitorias": 0.7462,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "dragon",
+  "tipo_defensor": "steel",
+  "num_combates": 141,
+  "taxa_vitorias": 0.7943,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "dragon",
+  "tipo_defensor": "water",
+  "num_combates": 584,
+  "taxa_vitorias": 0.7158,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "electric",
+  "tipo_defensor": "bug",
+  "num_combates": 473,
+  "taxa_vitorias": 0.7336,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "electric",
+  "tipo_defensor": "dark",
+  "num_combates": 210,
+  "taxa_vitorias": 0.5524,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "electric",
+  "tipo_defensor": "dragon",
+  "num_combates": 178,
+  "taxa_vitorias": 0.4551,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "electric",
+  "tipo_defensor": "electric",
+  "num_combates": 268,
+  "taxa_vitorias": 0.5000,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "electric",
+  "tipo_defensor": "fairy",
+  "num_combates": 132,
+  "taxa_vitorias": 0.8182,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "electric",
+  "tipo_defensor": "fighting",
+  "num_combates": 175,
+  "taxa_vitorias": 0.6971,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "electric",
+  "tipo_defensor": "fire",
+  "num_combates": 327,
+  "taxa_vitorias": 0.5994,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "electric",
+  "tipo_defensor": "flying",
+  "num_combates": 16,
+  "taxa_vitorias": 0.3125,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "electric",
+  "tipo_defensor": "ghost",
+  "num_combates": 214,
+  "taxa_vitorias": 0.7617,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "electric",
+  "tipo_defensor": "grass",
+  "num_combates": 459,
+  "taxa_vitorias": 0.6667,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "electric",
+  "tipo_defensor": "ground",
+  "num_combates": 218,
+  "taxa_vitorias": 0.0963,
+  "multiplicador": 0.0
+}, {
+  "tipo_atacante": "electric",
+  "tipo_defensor": "ice",
+  "num_combates": 163,
+  "taxa_vitorias": 0.7117,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "electric",
+  "tipo_defensor": "normal",
+  "num_combates": 676,
+  "taxa_vitorias": 0.6183,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "electric",
+  "tipo_defensor": "poison",
+  "num_combates": 201,
+  "taxa_vitorias": 0.7214,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "electric",
+  "tipo_defensor": "psychic",
+  "num_combates": 422,
+  "taxa_vitorias": 0.5664,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "electric",
+  "tipo_defensor": "rock",
+  "num_combates": 286,
+  "taxa_vitorias": 0.7133,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "electric",
+  "tipo_defensor": "steel",
+  "num_combates": 211,
+  "taxa_vitorias": 0.7109,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "electric",
+  "tipo_defensor": "water",
+  "num_combates": 713,
+  "taxa_vitorias": 0.6985,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "fairy",
+  "tipo_defensor": "bug",
+  "num_combates": 190,
+  "taxa_vitorias": 0.3895,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fairy",
+  "tipo_defensor": "dark",
+  "num_combates": 83,
+  "taxa_vitorias": 0.2048,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "fairy",
+  "tipo_defensor": "dragon",
+  "num_combates": 84,
+  "taxa_vitorias": 0.8929,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "fairy",
+  "tipo_defensor": "electric",
+  "num_combates": 132,
+  "taxa_vitorias": 0.1818,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fairy",
+  "tipo_defensor": "fairy",
+  "num_combates": 50,
+  "taxa_vitorias": 0.5000,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fairy",
+  "tipo_defensor": "fighting",
+  "num_combates": 59,
+  "taxa_vitorias": 0.3559,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "fairy",
+  "tipo_defensor": "fire",
+  "num_combates": 142,
+  "taxa_vitorias": 0.2183,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "fairy",
+  "tipo_defensor": "flying",
+  "num_combates": 11,
+  "taxa_vitorias": 0.2727,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fairy",
+  "tipo_defensor": "ghost",
+  "num_combates": 62,
+  "taxa_vitorias": 0.4516,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fairy",
+  "tipo_defensor": "grass",
+  "num_combates": 203,
+  "taxa_vitorias": 0.2906,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fairy",
+  "tipo_defensor": "ground",
+  "num_combates": 82,
+  "taxa_vitorias": 0.2927,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fairy",
+  "tipo_defensor": "ice",
+  "num_combates": 60,
+  "taxa_vitorias": 0.4000,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fairy",
+  "tipo_defensor": "normal",
+  "num_combates": 247,
+  "taxa_vitorias": 0.2429,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fairy",
+  "tipo_defensor": "poison",
+  "num_combates": 77,
+  "taxa_vitorias": 0.2987,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "fairy",
+  "tipo_defensor": "psychic",
+  "num_combates": 138,
+  "taxa_vitorias": 0.2681,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fairy",
+  "tipo_defensor": "rock",
+  "num_combates": 140,
+  "taxa_vitorias": 0.4071,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fairy",
+  "tipo_defensor": "steel",
+  "num_combates": 67,
+  "taxa_vitorias": 0.3731,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "fairy",
+  "tipo_defensor": "water",
+  "num_combates": 321,
+  "taxa_vitorias": 0.3115,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fighting",
+  "tipo_defensor": "bug",
+  "num_combates": 259,
+  "taxa_vitorias": 0.5598,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "fighting",
+  "tipo_defensor": "dark",
+  "num_combates": 97,
+  "taxa_vitorias": 0.4639,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "fighting",
+  "tipo_defensor": "dragon",
+  "num_combates": 121,
+  "taxa_vitorias": 0.3306,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fighting",
+  "tipo_defensor": "electric",
+  "num_combates": 175,
+  "taxa_vitorias": 0.3029,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fighting",
+  "tipo_defensor": "fairy",
+  "num_combates": 59,
+  "taxa_vitorias": 0.6441,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "fighting",
+  "tipo_defensor": "fighting",
+  "num_combates": 126,
+  "taxa_vitorias": 0.5000,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fighting",
+  "tipo_defensor": "fire",
+  "num_combates": 208,
+  "taxa_vitorias": 0.3365,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fighting",
+  "tipo_defensor": "flying",
+  "num_combates": 10,
+  "taxa_vitorias": 0.0000,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "fighting",
+  "tipo_defensor": "ghost",
+  "num_combates": 124,
+  "taxa_vitorias": 0.1371,
+  "multiplicador": 0.0
+}, {
+  "tipo_atacante": "fighting",
+  "tipo_defensor": "grass",
+  "num_combates": 260,
+  "taxa_vitorias": 0.5577,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fighting",
+  "tipo_defensor": "ground",
+  "num_combates": 122,
+  "taxa_vitorias": 0.4836,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fighting",
+  "tipo_defensor": "ice",
+  "num_combates": 90,
+  "taxa_vitorias": 0.5778,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "fighting",
+  "tipo_defensor": "normal",
+  "num_combates": 431,
+  "taxa_vitorias": 0.4246,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "fighting",
+  "tipo_defensor": "poison",
+  "num_combates": 127,
+  "taxa_vitorias": 0.5433,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "fighting",
+  "tipo_defensor": "psychic",
+  "num_combates": 231,
+  "taxa_vitorias": 0.3593,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "fighting",
+  "tipo_defensor": "rock",
+  "num_combates": 186,
+  "taxa_vitorias": 0.6667,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "fighting",
+  "tipo_defensor": "steel",
+  "num_combates": 109,
+  "taxa_vitorias": 0.5872,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "fighting",
+  "tipo_defensor": "water",
+  "num_combates": 461,
+  "taxa_vitorias": 0.4512,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fire",
+  "tipo_defensor": "bug",
+  "num_combates": 599,
+  "taxa_vitorias": 0.6694,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "fire",
+  "tipo_defensor": "dark",
+  "num_combates": 249,
+  "taxa_vitorias": 0.4900,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fire",
+  "tipo_defensor": "dragon",
+  "num_combates": 252,
+  "taxa_vitorias": 0.4325,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "fire",
+  "tipo_defensor": "electric",
+  "num_combates": 327,
+  "taxa_vitorias": 0.4006,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fire",
+  "tipo_defensor": "fairy",
+  "num_combates": 142,
+  "taxa_vitorias": 0.7817,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fire",
+  "tipo_defensor": "fighting",
+  "num_combates": 208,
+  "taxa_vitorias": 0.6635,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fire",
+  "tipo_defensor": "fire",
+  "num_combates": 430,
+  "taxa_vitorias": 0.5000,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "fire",
+  "tipo_defensor": "flying",
+  "num_combates": 29,
+  "taxa_vitorias": 0.2759,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fire",
+  "tipo_defensor": "ghost",
+  "num_combates": 244,
+  "taxa_vitorias": 0.6434,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fire",
+  "tipo_defensor": "grass",
+  "num_combates": 547,
+  "taxa_vitorias": 0.7038,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "fire",
+  "tipo_defensor": "ground",
+  "num_combates": 266,
+  "taxa_vitorias": 0.5188,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fire",
+  "tipo_defensor": "ice",
+  "num_combates": 196,
+  "taxa_vitorias": 0.6837,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "fire",
+  "tipo_defensor": "normal",
+  "num_combates": 861,
+  "taxa_vitorias": 0.5412,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fire",
+  "tipo_defensor": "poison",
+  "num_combates": 225,
+  "taxa_vitorias": 0.6711,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fire",
+  "tipo_defensor": "psychic",
+  "num_combates": 448,
+  "taxa_vitorias": 0.4799,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "fire",
+  "tipo_defensor": "rock",
+  "num_combates": 358,
+  "taxa_vitorias": 0.6034,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "fire",
+  "tipo_defensor": "steel",
+  "num_combates": 232,
+  "taxa_vitorias": 0.6853,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "fire",
+  "tipo_defensor": "water",
+  "num_combates": 931,
+  "taxa_vitorias": 0.5843,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "flying",
+  "tipo_defensor": "bug",
+  "num_combates": 38,
+  "taxa_vitorias": 0.7895,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "flying",
+  "tipo_defensor": "dark",
+  "num_combates": 23,
+  "taxa_vitorias": 0.7391,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "flying",
+  "tipo_defensor": "dragon",
+  "num_combates": 22,
+  "taxa_vitorias": 0.8182,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "flying",
+  "tipo_defensor": "electric",
+  "num_combates": 16,
+  "taxa_vitorias": 0.6875,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "flying",
+  "tipo_defensor": "fairy",
+  "num_combates": 11,
+  "taxa_vitorias": 0.7273,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "flying",
+  "tipo_defensor": "fighting",
+  "num_combates": 10,
+  "taxa_vitorias": 1.0000,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "flying",
+  "tipo_defensor": "fire",
+  "num_combates": 29,
+  "taxa_vitorias": 0.7241,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "flying",
+  "tipo_defensor": "flying",
+  "num_combates": 2,
+  "taxa_vitorias": 0.5000,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "flying",
+  "tipo_defensor": "ghost",
+  "num_combates": 23,
+  "taxa_vitorias": 0.8261,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "flying",
+  "tipo_defensor": "grass",
+  "num_combates": 36,
+  "taxa_vitorias": 0.7500,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "flying",
+  "tipo_defensor": "ground",
+  "num_combates": 19,
+  "taxa_vitorias": 0.8947,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "flying",
+  "tipo_defensor": "ice",
+  "num_combates": 20,
+  "taxa_vitorias": 0.8000,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "flying",
+  "tipo_defensor": "normal",
+  "num_combates": 61,
+  "taxa_vitorias": 0.7213,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "flying",
+  "tipo_defensor": "poison",
+  "num_combates": 20,
+  "taxa_vitorias": 0.8000,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "flying",
+  "tipo_defensor": "psychic",
+  "num_combates": 35,
+  "taxa_vitorias": 0.6000,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "flying",
+  "tipo_defensor": "rock",
+  "num_combates": 24,
+  "taxa_vitorias": 0.6667,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "flying",
+  "tipo_defensor": "steel",
+  "num_combates": 21,
+  "taxa_vitorias": 0.8571,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "flying",
+  "tipo_defensor": "water",
+  "num_combates": 68,
+  "taxa_vitorias": 0.7647,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ghost",
+  "tipo_defensor": "bug",
+  "num_combates": 356,
+  "taxa_vitorias": 0.5449,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ghost",
+  "tipo_defensor": "dark",
+  "num_combates": 142,
+  "taxa_vitorias": 0.3310,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "ghost",
+  "tipo_defensor": "dragon",
+  "num_combates": 153,
+  "taxa_vitorias": 0.3137,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ghost",
+  "tipo_defensor": "electric",
+  "num_combates": 214,
+  "taxa_vitorias": 0.2383,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ghost",
+  "tipo_defensor": "fairy",
+  "num_combates": 62,
+  "taxa_vitorias": 0.5484,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ghost",
+  "tipo_defensor": "fighting",
+  "num_combates": 124,
+  "taxa_vitorias": 0.8629,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ghost",
+  "tipo_defensor": "fire",
+  "num_combates": 244,
+  "taxa_vitorias": 0.3566,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ghost",
+  "tipo_defensor": "flying",
+  "num_combates": 23,
+  "taxa_vitorias": 0.1739,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ghost",
+  "tipo_defensor": "ghost",
+  "num_combates": 166,
+  "taxa_vitorias": 0.5000,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "ghost",
+  "tipo_defensor": "grass",
+  "num_combates": 351,
+  "taxa_vitorias": 0.4929,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ghost",
+  "tipo_defensor": "ground",
+  "num_combates": 159,
+  "taxa_vitorias": 0.4654,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ghost",
+  "tipo_defensor": "ice",
+  "num_combates": 123,
+  "taxa_vitorias": 0.5041,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ghost",
+  "tipo_defensor": "normal",
+  "num_combates": 484,
+  "taxa_vitorias": 0.5062,
+  "multiplicador": 0.0
+}, {
+  "tipo_atacante": "ghost",
+  "tipo_defensor": "poison",
+  "num_combates": 145,
+  "taxa_vitorias": 0.5724,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ghost",
+  "tipo_defensor": "psychic",
+  "num_combates": 289,
+  "taxa_vitorias": 0.4498,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "ghost",
+  "tipo_defensor": "rock",
+  "num_combates": 208,
+  "taxa_vitorias": 0.6154,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ghost",
+  "tipo_defensor": "steel",
+  "num_combates": 158,
+  "taxa_vitorias": 0.5506,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ghost",
+  "tipo_defensor": "water",
+  "num_combates": 500,
+  "taxa_vitorias": 0.4680,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "grass",
+  "tipo_defensor": "bug",
+  "num_combates": 764,
+  "taxa_vitorias": 0.4817,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "grass",
+  "tipo_defensor": "dark",
+  "num_combates": 332,
+  "taxa_vitorias": 0.2771,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "grass",
+  "tipo_defensor": "dragon",
+  "num_combates": 313,
+  "taxa_vitorias": 0.3099,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "grass",
+  "tipo_defensor": "electric",
+  "num_combates": 459,
+  "taxa_vitorias": 0.3333,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "grass",
+  "tipo_defensor": "fairy",
+  "num_combates": 203,
+  "taxa_vitorias": 0.7094,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "grass",
+  "tipo_defensor": "fighting",
+  "num_combates": 260,
+  "taxa_vitorias": 0.4423,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "grass",
+  "tipo_defensor": "fire",
+  "num_combates": 547,
+  "taxa_vitorias": 0.2962,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "grass",
+  "tipo_defensor": "flying",
+  "num_combates": 36,
+  "taxa_vitorias": 0.2500,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "grass",
+  "tipo_defensor": "ghost",
+  "num_combates": 351,
+  "taxa_vitorias": 0.5071,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "grass",
+  "tipo_defensor": "grass",
+  "num_combates": 708,
+  "taxa_vitorias": 0.5000,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "grass",
+  "tipo_defensor": "ground",
+  "num_combates": 318,
+  "taxa_vitorias": 0.4906,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "grass",
+  "tipo_defensor": "ice",
+  "num_combates": 244,
+  "taxa_vitorias": 0.4180,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "grass",
+  "tipo_defensor": "normal",
+  "num_combates": 984,
+  "taxa_vitorias": 0.3994,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "grass",
+  "tipo_defensor": "poison",
+  "num_combates": 301,
+  "taxa_vitorias": 0.4352,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "grass",
+  "tipo_defensor": "psychic",
+  "num_combates": 632,
+  "taxa_vitorias": 0.3734,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "grass",
+  "tipo_defensor": "rock",
+  "num_combates": 482,
+  "taxa_vitorias": 0.5685,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "grass",
+  "tipo_defensor": "steel",
+  "num_combates": 274,
+  "taxa_vitorias": 0.5036,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "grass",
+  "tipo_defensor": "water",
+  "num_combates": 1208,
+  "taxa_vitorias": 0.4983,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "ground",
+  "tipo_defensor": "bug",
+  "num_combates": 335,
+  "taxa_vitorias": 0.5224,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "ground",
+  "tipo_defensor": "dark",
+  "num_combates": 148,
+  "taxa_vitorias": 0.3919,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ground",
+  "tipo_defensor": "dragon",
+  "num_combates": 137,
+  "taxa_vitorias": 0.3066,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ground",
+  "tipo_defensor": "electric",
+  "num_combates": 218,
+  "taxa_vitorias": 0.9037,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "ground",
+  "tipo_defensor": "fairy",
+  "num_combates": 82,
+  "taxa_vitorias": 0.7073,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ground",
+  "tipo_defensor": "fighting",
+  "num_combates": 122,
+  "taxa_vitorias": 0.5164,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ground",
+  "tipo_defensor": "fire",
+  "num_combates": 266,
+  "taxa_vitorias": 0.4812,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "ground",
+  "tipo_defensor": "flying",
+  "num_combates": 19,
+  "taxa_vitorias": 0.1053,
+  "multiplicador": 0.0
+}, {
+  "tipo_atacante": "ground",
+  "tipo_defensor": "ghost",
+  "num_combates": 159,
+  "taxa_vitorias": 0.5346,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ground",
+  "tipo_defensor": "grass",
+  "num_combates": 318,
+  "taxa_vitorias": 0.5094,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "ground",
+  "tipo_defensor": "ground",
+  "num_combates": 144,
+  "taxa_vitorias": 0.5000,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ground",
+  "tipo_defensor": "ice",
+  "num_combates": 122,
+  "taxa_vitorias": 0.4836,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ground",
+  "tipo_defensor": "normal",
+  "num_combates": 472,
+  "taxa_vitorias": 0.4894,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ground",
+  "tipo_defensor": "poison",
+  "num_combates": 149,
+  "taxa_vitorias": 0.6174,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "ground",
+  "tipo_defensor": "psychic",
+  "num_combates": 274,
+  "taxa_vitorias": 0.5036,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ground",
+  "tipo_defensor": "rock",
+  "num_combates": 229,
+  "taxa_vitorias": 0.6419,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "ground",
+  "tipo_defensor": "steel",
+  "num_combates": 122,
+  "taxa_vitorias": 0.6230,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "ground",
+  "tipo_defensor": "water",
+  "num_combates": 571,
+  "taxa_vitorias": 0.5306,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ice",
+  "tipo_defensor": "bug",
+  "num_combates": 295,
+  "taxa_vitorias": 0.5119,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ice",
+  "tipo_defensor": "dark",
+  "num_combates": 119,
+  "taxa_vitorias": 0.3193,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ice",
+  "tipo_defensor": "dragon",
+  "num_combates": 116,
+  "taxa_vitorias": 0.3103,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "ice",
+  "tipo_defensor": "electric",
+  "num_combates": 163,
+  "taxa_vitorias": 0.2883,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ice",
+  "tipo_defensor": "fairy",
+  "num_combates": 60,
+  "taxa_vitorias": 0.6000,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ice",
+  "tipo_defensor": "fighting",
+  "num_combates": 90,
+  "taxa_vitorias": 0.4222,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ice",
+  "tipo_defensor": "fire",
+  "num_combates": 196,
+  "taxa_vitorias": 0.3163,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "ice",
+  "tipo_defensor": "flying",
+  "num_combates": 20,
+  "taxa_vitorias": 0.2000,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "ice",
+  "tipo_defensor": "ghost",
+  "num_combates": 123,
+  "taxa_vitorias": 0.4959,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ice",
+  "tipo_defensor": "grass",
+  "num_combates": 244,
+  "taxa_vitorias": 0.5820,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "ice",
+  "tipo_defensor": "ground",
+  "num_combates": 122,
+  "taxa_vitorias": 0.5164,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "ice",
+  "tipo_defensor": "ice",
+  "num_combates": 94,
+  "taxa_vitorias": 0.5000,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "ice",
+  "tipo_defensor": "normal",
+  "num_combates": 365,
+  "taxa_vitorias": 0.3945,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ice",
+  "tipo_defensor": "poison",
+  "num_combates": 99,
+  "taxa_vitorias": 0.4949,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ice",
+  "tipo_defensor": "psychic",
+  "num_combates": 224,
+  "taxa_vitorias": 0.3750,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ice",
+  "tipo_defensor": "rock",
+  "num_combates": 182,
+  "taxa_vitorias": 0.4890,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "ice",
+  "tipo_defensor": "steel",
+  "num_combates": 119,
+  "taxa_vitorias": 0.4706,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "ice",
+  "tipo_defensor": "water",
+  "num_combates": 445,
+  "taxa_vitorias": 0.4719,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "normal",
+  "tipo_defensor": "bug",
+  "num_combates": 1066,
+  "taxa_vitorias": 0.6135,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "normal",
+  "tipo_defensor": "dark",
+  "num_combates": 495,
+  "taxa_vitorias": 0.4525,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "normal",
+  "tipo_defensor": "dragon",
+  "num_combates": 479,
+  "taxa_vitorias": 0.4259,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "normal",
+  "tipo_defensor": "electric",
+  "num_combates": 676,
+  "taxa_vitorias": 0.3817,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "normal",
+  "tipo_defensor": "fairy",
+  "num_combates": 247,
+  "taxa_vitorias": 0.7571,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "normal",
+  "tipo_defensor": "fighting",
+  "num_combates": 431,
+  "taxa_vitorias": 0.5754,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "normal",
+  "tipo_defensor": "fire",
+  "num_combates": 861,
+  "taxa_vitorias": 0.4588,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "normal",
+  "tipo_defensor": "flying",
+  "num_combates": 61,
+  "taxa_vitorias": 0.2787,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "normal",
+  "tipo_defensor": "ghost",
+  "num_combates": 484,
+  "taxa_vitorias": 0.4938,
+  "multiplicador": 0.0
+}, {
+  "tipo_atacante": "normal",
+  "tipo_defensor": "grass",
+  "num_combates": 984,
+  "taxa_vitorias": 0.6006,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "normal",
+  "tipo_defensor": "ground",
+  "num_combates": 472,
+  "taxa_vitorias": 0.5106,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "normal",
+  "tipo_defensor": "ice",
+  "num_combates": 365,
+  "taxa_vitorias": 0.6055,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "normal",
+  "tipo_defensor": "normal",
+  "num_combates": 1416,
+  "taxa_vitorias": 0.5000,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "normal",
+  "tipo_defensor": "poison",
+  "num_combates": 432,
+  "taxa_vitorias": 0.6389,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "normal",
+  "tipo_defensor": "psychic",
+  "num_combates": 811,
+  "taxa_vitorias": 0.4525,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "normal",
+  "tipo_defensor": "rock",
+  "num_combates": 682,
+  "taxa_vitorias": 0.6056,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "normal",
+  "tipo_defensor": "steel",
+  "num_combates": 422,
+  "taxa_vitorias": 0.5782,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "normal",
+  "tipo_defensor": "water",
+  "num_combates": 1702,
+  "taxa_vitorias": 0.6058,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "poison",
+  "tipo_defensor": "bug",
+  "num_combates": 324,
+  "taxa_vitorias": 0.5340,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "poison",
+  "tipo_defensor": "dark",
+  "num_combates": 125,
+  "taxa_vitorias": 0.3360,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "poison",
+  "tipo_defensor": "dragon",
+  "num_combates": 173,
+  "taxa_vitorias": 0.3121,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "poison",
+  "tipo_defensor": "electric",
+  "num_combates": 201,
+  "taxa_vitorias": 0.2786,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "poison",
+  "tipo_defensor": "fairy",
+  "num_combates": 77,
+  "taxa_vitorias": 0.7013,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "poison",
+  "tipo_defensor": "fighting",
+  "num_combates": 127,
+  "taxa_vitorias": 0.4567,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "poison",
+  "tipo_defensor": "fire",
+  "num_combates": 225,
+  "taxa_vitorias": 0.3289,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "poison",
+  "tipo_defensor": "flying",
+  "num_combates": 20,
+  "taxa_vitorias": 0.2000,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "poison",
+  "tipo_defensor": "ghost",
+  "num_combates": 145,
+  "taxa_vitorias": 0.4276,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "poison",
+  "tipo_defensor": "grass",
+  "num_combates": 301,
+  "taxa_vitorias": 0.5648,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "poison",
+  "tipo_defensor": "ground",
+  "num_combates": 149,
+  "taxa_vitorias": 0.3826,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "poison",
+  "tipo_defensor": "ice",
+  "num_combates": 99,
+  "taxa_vitorias": 0.5051,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "poison",
+  "tipo_defensor": "normal",
+  "num_combates": 432,
+  "taxa_vitorias": 0.3611,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "poison",
+  "tipo_defensor": "poison",
+  "num_combates": 148,
+  "taxa_vitorias": 0.5000,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "poison",
+  "tipo_defensor": "psychic",
+  "num_combates": 270,
+  "taxa_vitorias": 0.3889,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "poison",
+  "tipo_defensor": "rock",
+  "num_combates": 194,
+  "taxa_vitorias": 0.6082,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "poison",
+  "tipo_defensor": "steel",
+  "num_combates": 120,
+  "taxa_vitorias": 0.2417,
+  "multiplicador": 0.0
+}, {
+  "tipo_atacante": "poison",
+  "tipo_defensor": "water",
+  "num_combates": 518,
+  "taxa_vitorias": 0.4537,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "psychic",
+  "tipo_defensor": "bug",
+  "num_combates": 646,
+  "taxa_vitorias": 0.5759,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "psychic",
+  "tipo_defensor": "dark",
+  "num_combates": 291,
+  "taxa_vitorias": 0.0550,
+  "multiplicador": 0.0
+}, {
+  "tipo_atacante": "psychic",
+  "tipo_defensor": "dragon",
+  "num_combates": 276,
+  "taxa_vitorias": 0.4638,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "psychic",
+  "tipo_defensor": "electric",
+  "num_combates": 422,
+  "taxa_vitorias": 0.4336,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "psychic",
+  "tipo_defensor": "fairy",
+  "num_combates": 138,
+  "taxa_vitorias": 0.7319,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "psychic",
+  "tipo_defensor": "fighting",
+  "num_combates": 231,
+  "taxa_vitorias": 0.6407,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "psychic",
+  "tipo_defensor": "fire",
+  "num_combates": 448,
+  "taxa_vitorias": 0.5201,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "psychic",
+  "tipo_defensor": "flying",
+  "num_combates": 35,
+  "taxa_vitorias": 0.4000,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "psychic",
+  "tipo_defensor": "ghost",
+  "num_combates": 289,
+  "taxa_vitorias": 0.5502,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "psychic",
+  "tipo_defensor": "grass",
+  "num_combates": 632,
+  "taxa_vitorias": 0.6266,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "psychic",
+  "tipo_defensor": "ground",
+  "num_combates": 274,
+  "taxa_vitorias": 0.4964,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "psychic",
+  "tipo_defensor": "ice",
+  "num_combates": 224,
+  "taxa_vitorias": 0.6250,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "psychic",
+  "tipo_defensor": "normal",
+  "num_combates": 811,
+  "taxa_vitorias": 0.5475,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "psychic",
+  "tipo_defensor": "poison",
+  "num_combates": 270,
+  "taxa_vitorias": 0.6111,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "psychic",
+  "tipo_defensor": "psychic",
+  "num_combates": 518,
+  "taxa_vitorias": 0.5000,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "psychic",
+  "tipo_defensor": "rock",
+  "num_combates": 445,
+  "taxa_vitorias": 0.6292,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "psychic",
+  "tipo_defensor": "steel",
+  "num_combates": 279,
+  "taxa_vitorias": 0.5520,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "psychic",
+  "tipo_defensor": "water",
+  "num_combates": 1086,
+  "taxa_vitorias": 0.6160,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "rock",
+  "tipo_defensor": "bug",
+  "num_combates": 487,
+  "taxa_vitorias": 0.5421,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "rock",
+  "tipo_defensor": "dark",
+  "num_combates": 246,
+  "taxa_vitorias": 0.2642,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "rock",
+  "tipo_defensor": "dragon",
+  "num_combates": 260,
+  "taxa_vitorias": 0.2538,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "rock",
+  "tipo_defensor": "electric",
+  "num_combates": 286,
+  "taxa_vitorias": 0.2867,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "rock",
+  "tipo_defensor": "fairy",
+  "num_combates": 140,
+  "taxa_vitorias": 0.5929,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "rock",
+  "tipo_defensor": "fighting",
+  "num_combates": 186,
+  "taxa_vitorias": 0.3333,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "rock",
+  "tipo_defensor": "fire",
+  "num_combates": 358,
+  "taxa_vitorias": 0.3966,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "rock",
+  "tipo_defensor": "flying",
+  "num_combates": 24,
+  "taxa_vitorias": 0.3333,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "rock",
+  "tipo_defensor": "ghost",
+  "num_combates": 208,
+  "taxa_vitorias": 0.3846,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "rock",
+  "tipo_defensor": "grass",
+  "num_combates": 482,
+  "taxa_vitorias": 0.4315,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "rock",
+  "tipo_defensor": "ground",
+  "num_combates": 229,
+  "taxa_vitorias": 0.3581,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "rock",
+  "tipo_defensor": "ice",
+  "num_combates": 182,
+  "taxa_vitorias": 0.5110,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "rock",
+  "tipo_defensor": "normal",
+  "num_combates": 682,
+  "taxa_vitorias": 0.3944,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "rock",
+  "tipo_defensor": "poison",
+  "num_combates": 194,
+  "taxa_vitorias": 0.3918,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "rock",
+  "tipo_defensor": "psychic",
+  "num_combates": 445,
+  "taxa_vitorias": 0.3708,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "rock",
+  "tipo_defensor": "rock",
+  "num_combates": 314,
+  "taxa_vitorias": 0.5000,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "rock",
+  "tipo_defensor": "steel",
+  "num_combates": 179,
+  "taxa_vitorias": 0.4804,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "rock",
+  "tipo_defensor": "water",
+  "num_combates": 759,
+  "taxa_vitorias": 0.4097,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "steel",
+  "tipo_defensor": "bug",
+  "num_combates": 289,
+  "taxa_vitorias": 0.5294,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "steel",
+  "tipo_defensor": "dark",
+  "num_combates": 153,
+  "taxa_vitorias": 0.3268,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "steel",
+  "tipo_defensor": "dragon",
+  "num_combates": 141,
+  "taxa_vitorias": 0.2057,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "steel",
+  "tipo_defensor": "electric",
+  "num_combates": 211,
+  "taxa_vitorias": 0.2891,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "steel",
+  "tipo_defensor": "fairy",
+  "num_combates": 67,
+  "taxa_vitorias": 0.6269,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "steel",
+  "tipo_defensor": "fighting",
+  "num_combates": 109,
+  "taxa_vitorias": 0.4128,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "steel",
+  "tipo_defensor": "fire",
+  "num_combates": 232,
+  "taxa_vitorias": 0.3147,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "steel",
+  "tipo_defensor": "flying",
+  "num_combates": 21,
+  "taxa_vitorias": 0.1429,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "steel",
+  "tipo_defensor": "ghost",
+  "num_combates": 158,
+  "taxa_vitorias": 0.4494,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "steel",
+  "tipo_defensor": "grass",
+  "num_combates": 274,
+  "taxa_vitorias": 0.4964,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "steel",
+  "tipo_defensor": "ground",
+  "num_combates": 122,
+  "taxa_vitorias": 0.3770,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "steel",
+  "tipo_defensor": "ice",
+  "num_combates": 119,
+  "taxa_vitorias": 0.5294,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "steel",
+  "tipo_defensor": "normal",
+  "num_combates": 422,
+  "taxa_vitorias": 0.4218,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "steel",
+  "tipo_defensor": "poison",
+  "num_combates": 120,
+  "taxa_vitorias": 0.7583,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "steel",
+  "tipo_defensor": "psychic",
+  "num_combates": 279,
+  "taxa_vitorias": 0.4480,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "steel",
+  "tipo_defensor": "rock",
+  "num_combates": 179,
+  "taxa_vitorias": 0.5196,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "steel",
+  "tipo_defensor": "steel",
+  "num_combates": 146,
+  "taxa_vitorias": 0.5000,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "steel",
+  "tipo_defensor": "water",
+  "num_combates": 497,
+  "taxa_vitorias": 0.3823,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "water",
+  "tipo_defensor": "bug",
+  "num_combates": 1204,
+  "taxa_vitorias": 0.5390,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "water",
+  "tipo_defensor": "dark",
+  "num_combates": 520,
+  "taxa_vitorias": 0.3558,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "water",
+  "tipo_defensor": "dragon",
+  "num_combates": 584,
+  "taxa_vitorias": 0.2842,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "water",
+  "tipo_defensor": "electric",
+  "num_combates": 713,
+  "taxa_vitorias": 0.3015,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "water",
+  "tipo_defensor": "fairy",
+  "num_combates": 321,
+  "taxa_vitorias": 0.6885,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "water",
+  "tipo_defensor": "fighting",
+  "num_combates": 461,
+  "taxa_vitorias": 0.5488,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "water",
+  "tipo_defensor": "fire",
+  "num_combates": 931,
+  "taxa_vitorias": 0.4157,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "water",
+  "tipo_defensor": "flying",
+  "num_combates": 68,
+  "taxa_vitorias": 0.2353,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "water",
+  "tipo_defensor": "ghost",
+  "num_combates": 500,
+  "taxa_vitorias": 0.5320,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "water",
+  "tipo_defensor": "grass",
+  "num_combates": 1208,
+  "taxa_vitorias": 0.5017,
+  "multiplicador": 0.5
+}, {
+  "tipo_atacante": "water",
+  "tipo_defensor": "ground",
+  "num_combates": 571,
+  "taxa_vitorias": 0.4694,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "water",
+  "tipo_defensor": "ice",
+  "num_combates": 445,
+  "taxa_vitorias": 0.5281,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "water",
+  "tipo_defensor": "normal",
+  "num_combates": 1702,
+  "taxa_vitorias": 0.3942,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "water",
+  "tipo_defensor": "poison",
+  "num_combates": 518,
+  "taxa_vitorias": 0.5463,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "water",
+  "tipo_defensor": "psychic",
+  "num_combates": 1086,
+  "taxa_vitorias": 0.3840,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "water",
+  "tipo_defensor": "rock",
+  "num_combates": 759,
+  "taxa_vitorias": 0.5903,
+  "multiplicador": 2.0
+}, {
+  "tipo_atacante": "water",
+  "tipo_defensor": "steel",
+  "num_combates": 497,
+  "taxa_vitorias": 0.6177,
+  "multiplicador": 1.0
+}, {
+  "tipo_atacante": "water",
+  "tipo_defensor": "water",
+  "num_combates": 1942,
+  "taxa_vitorias": 0.5000,
+  "multiplicador": 0.5
+}
+]'''
+
+dados = json.loads(json_data)
+
+print("| Tipo Atacante | Tipo Defensor | Combates | Taxa de Vitórias | Multiplicador |")
+print("| --- | --- | --- | --- | --- |")
+
+# O loop agora passa pelos dados na exata ordem em que estão no JSON
+for linha in dados:
+    atacante = linha["tipo_atacante"]
+    defensor = linha["tipo_defensor"]
+    combates = linha["num_combates"]
+    
+    # Converte para porcentagem com 2 casas decimais e troca ponto por vírgula
+    taxa = f"{linha['taxa_vitorias'] * 100:.2f}%".replace(".", ",")
+    
+    # Adiciona a tag (Imunidade) se o multiplicador for 0.0
+    mult = linha["multiplicador"]
+    if mult == 0.0:
+        mult_str = "0.0 (Imunidade)"
+    else:
+        mult_str = str(mult)
+        
+    print(f"| {atacante} | {defensor} | {combates} | {taxa} | {mult_str} |")
