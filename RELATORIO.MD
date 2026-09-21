@@ -556,12 +556,6 @@ Por fim, a base da tabela mostra tipos com vantagem (Multiplicador = 2.0) perden
 
 ---
 
-Aqui está a formatação e a interpretação para a sua Análise 8. Essa foi uma sacada excelente do seu grupo para fechar o trabalho, pois ela usa aquele atributo derivado que vocês criaram na carga do *Silver*!
-
-Pode copiar e colar no seu `RELATORIO.md`:
-
----
-
 ### Análise 8 (Proposta do Grupo): Taxa de vitórias por categoria de raridade
 
 **Pergunta de Negócio:** Pokémon de categorias mais raras (Lendários e Míticos) realmente apresentam um desempenho superior nas batalhas em relação aos Pokémon comuns?
