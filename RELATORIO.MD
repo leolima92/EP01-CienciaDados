@@ -170,11 +170,6 @@ Nesta análise cruzamos os resultados do simulador com a tabela de efetividade o
 Porém, o impacto da vantagem de tipo é muito fraco quando comparado ao impacto da velocidade (visto na Análise 5). O caso mais gritante é o multiplicador 0.0 (imunidade): na mecânica real do jogo, um ataque desse tipo não causa dano algum, mas aqui o Pokémon teoricamente "imune" ainda perde 31,69% das vezes. Da mesma forma, ter o dobro de dano a seu favor (2.0) só garante vitória em cerca de 55% dos casos, um número muito pouco acima da média neutra. Isso indica que a lógica por trás de `combats.csv` valorizou excessivamente os *status* brutos (principalmente a velocidade e o poder ofensivo), deixando as interações de tipos da franquia em segundo plano.
 
 ---
-Aqui está a formatação para a Análise 7, focando no destaque que a query puxou (onde vitória e efetividade divergem).
-
-*Como a matriz de 18x18 completa geraria uma tabela absurdamente grande (324 linhas), a boa prática de relatórios é não colar a matriz inteira na tela (a menos que o professor exija). Em vez disso, focamos na tabela do "Destaque" (divergências), que é onde está a verdadeira informação de negócio.*
-
----
 
 ### Análise 7: Matriz de confronto entre tipos (18x18) e Divergências
 
